@@ -1,0 +1,6 @@
+{
+  "constants": {
+    "TEMP_GAUSS_MIN": 0.05,
+    "STRUCTURE_MIN": 0.1
+  }
+}

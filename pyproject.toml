@@ -1,0 +1,23 @@
+[project]
+name = "fishing-verification-hub"
+version = "0.1.0"
+description = "Verification hub for fishing simulation: derive env fields, visualize, test, and auto-doc."
+requires-python = ">=3.10"
+dependencies = [
+  "numpy>=1.24",
+  "pandas>=2.0",
+  "matplotlib>=3.7",
+  "pytest>=8.0",
+  "ruff>=0.4"
+]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"

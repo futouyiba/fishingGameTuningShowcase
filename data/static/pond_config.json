@@ -1,0 +1,11 @@
+{
+  "ponds": [
+    {
+      "pond_id": 1001,
+      "name": "Demo Pond",
+      "grid": {"x": 32, "y": 32, "z": 8, "dx": 1.0, "dy": 1.0, "dz": 1.0},
+      "structure_map": "data/samples/pond_1001_structure.csv",
+      "base_abundance": {"101": 1.0, "102": 0.7}
+    }
+  ]
+}

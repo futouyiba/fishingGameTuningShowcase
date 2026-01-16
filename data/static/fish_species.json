@@ -1,0 +1,6 @@
+{
+  "species": [
+    {"id": 1, "name": "Bluegill", "temp_pref_c": 22.0, "temp_width_c": 6.0},
+    {"id": 2, "name": "Trout", "temp_pref_c": 12.0, "temp_width_c": 5.0}
+  ]
+}

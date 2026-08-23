@@ -4,9 +4,9 @@ from collections.abc import Mapping
 from dataclasses import dataclass, replace
 from hashlib import sha256
 from json import dumps
-from math import isfinite
 from typing import Any
 
+from candidate_weight_reference import calculate_true_pool
 from fallback_reference import (
     FallbackSafetyState,
     TrueNoneSettlement,
@@ -81,16 +81,6 @@ def _deterministic_u(address: RandomAddress) -> float:
     return int.from_bytes(raw, "big") / 2**64
 
 
-def _canonical_weights(weights: Mapping[str, float]) -> tuple[tuple[str, float], ...]:
-    result = []
-    for species_id, raw_weight in weights.items():
-        weight = float(raw_weight)
-        if not isfinite(weight) or weight < 0.0:
-            raise ValueError(f"weight for {species_id!r} must be finite and >= 0")
-        result.append((species_id, weight))
-    return tuple(sorted(result))
-
-
 def _candidate_digest(weights: tuple[tuple[str, float], ...], pan_capacity: float) -> str:
     payload = dumps(
         {"panCapacity": float(pan_capacity), "weights": weights},
@@ -105,23 +95,28 @@ def _true_roll(
     *,
     rng_epoch: str,
 ) -> tuple[float, str, RandomAddress, str]:
-    if not isfinite(entry.pan_capacity) or entry.pan_capacity <= 0:
-        raise ValueError("pan_capacity must be finite and > 0")
-    weights = _canonical_weights(entry.candidate_weights)
-    total_weight = sum(weight for _, weight in weights)
-    denominator = max(float(entry.pan_capacity), total_weight)
-    p_spawn = min(total_weight / float(entry.pan_capacity), 1.0)
+    pool = calculate_true_pool(entry.candidate_weights, entry.pan_capacity)
+    canonical_species = tuple(sorted(pool.species))
+    canonical_weights = tuple(
+        (species_id, pool.species[species_id].weight) for species_id in canonical_species
+    )
+
     address = RandomAddress(rng_epoch, "TRUE_ROLL", entry.opportunity_seq, 0)
-    draw = _deterministic_u(address) * denominator
+    draw = _deterministic_u(address)
+    cumulative_probability = 0.0
     result = "TrueNone"
-    if draw < total_weight:
-        cumulative = 0.0
-        for species_id, weight in weights:
-            cumulative += weight
-            if draw < cumulative:
-                result = f"TrueSpawn:{species_id}"
-                break
-    return p_spawn, result, address, _candidate_digest(weights, entry.pan_capacity)
+    for species_id in canonical_species:
+        cumulative_probability += pool.species[species_id].probability_per_opportunity
+        if draw < cumulative_probability:
+            result = f"TrueSpawn:{species_id}"
+            break
+
+    return (
+        pool.spawn_probability_per_opportunity,
+        result,
+        address,
+        _candidate_digest(canonical_weights, entry.pan_capacity),
+    )
 
 
 def _run(

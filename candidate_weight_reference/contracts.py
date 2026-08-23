@@ -35,12 +35,7 @@ def derive_has_eligible_response_mode(
     mode_responses: Iterable[Mapping[str, Any]],
 ) -> bool:
     """Derive the Capture packet gate from mode-local eligibility only."""
-    found_mode = False
-    for response in mode_responses:
-        found_mode = True
-        if bool(_required(response, "modeEligible")):
-            return True
-    return False if found_mode else False
+    return any(bool(_required(response, "modeEligible")) for response in mode_responses)
 
 
 def read_readiness_public_surface(

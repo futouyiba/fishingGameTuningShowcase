@@ -4,7 +4,12 @@ import math
 
 import pytest
 
-from fallback_reference import FallbackSafetyState, settle_true_none
+from fallback_reference import (
+    FallbackSafetyState,
+    fallback_gate_hits,
+    plan_fallback_gate,
+    settle_true_none,
+)
 
 
 def test_true_none_uses_exact_hazard_from_authoritative_post_floor_p_spawn() -> None:
@@ -21,6 +26,32 @@ def test_true_none_uses_exact_hazard_from_authoritative_post_floor_p_spawn() -> 
     assert result.state.debt == pytest.approx(-math.log(0.70))
     assert result.state.active_time_credited == pytest.approx(5.0)
     assert result.rng_calls == ()
+
+
+def test_fallback_gate_plan_owns_pool_and_hazard_semantics() -> None:
+    state = FallbackSafetyState(applied_extra_hazard=0.25)
+
+    blocked = plan_fallback_gate(
+        state,
+        resolved_g_target=0.80,
+        fallback_pool=(),
+    )
+    assert blocked.should_attempt is False
+    assert blocked.delta_g == 0.0
+    assert blocked.gate_probability == 0.0
+    assert blocked.g_target == pytest.approx(0.25)
+
+    deliverable = plan_fallback_gate(
+        state,
+        resolved_g_target=0.80,
+        fallback_pool=("a", "b"),
+    )
+    assert deliverable.should_attempt is True
+    assert deliverable.delta_g == pytest.approx(0.55)
+    assert deliverable.g_target == pytest.approx(0.80)
+    assert deliverable.gate_probability == pytest.approx(1.0 - math.exp(-0.55))
+    assert fallback_gate_hits(deliverable, 0.0) is True
+    assert fallback_gate_hits(deliverable, 0.99) is False
 
 
 def test_rt_fb_017_empty_pool_does_not_burn_applied_hazard_or_rng() -> None:

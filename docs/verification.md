@@ -27,10 +27,21 @@ Initial release-blocking coverage:
 
 This runner deliberately consumes an upstream `resolved_g_target`; it does not redefine the current adaptive-effective-time / Tail Envelope policy. It also treats `OpportunitySeq` as a logical replay identity, not a per-opportunity RPC requirement.
 
+### Current Server replay reference tests
+Tests under `tests/replay_integration/` protect replay semantics independently from transport shape.
+
+Initial release-blocking coverage:
+- `RP-AUTH-034`: the same ordered logical Opportunity sequence produces the same canonical candidate digests, `p_spawn`, TrueRoll results, Fallback state transitions, RandomAddresses, and Fish Spawn Commit boundary whether evaluated through step hooks or one batch replay window. Only transport request count may differ; failure class=`REPLAY_SEMANTICS_ASSUMED_AS_RPC`.
+- Inputs-only authority: changing Client-derived debug claims (`pSpawn`, TrueRoll, Fish identity) does not alter authoritative replay output.
+- Canonical candidate order: dictionary/insertion order cannot change the canonical digest or stochastic result.
+- Addressed RNG: reference draws are separated by `RngEpoch + Domain + LogicalEvent + DrawSlot`; optional Fallback branches do not define the `TRUE_ROLL` address.
+
+This is a reference implementation of addressed deterministic replay semantics, not a production RNG library, network protocol, cadence guard, lease/persistence implementation, or anti-cheat proof.
+
 ## CI gate
 `./verify.sh` remains the repository gate and GitHub Actions runs it on push and pull request. The gate uses non-mutating `ruff format --check`, Ruff lint, and pytest.
 
 A green repository CI means only that the registered reference tests passed. It does **not** prove production FG runtime compatibility until a production adapter is pinned to a real repo/branch/commit/build and differential-tested against these references.
 
 ## Regression policy
-Store small deterministic fixtures and numeric results. Prefer numeric assertions over pixel-perfect image diffs. Do not use Monte Carlo to test deterministic fixed-pan or cumulative-hazard identities.
+Store small deterministic fixtures and numeric results. Prefer numeric assertions over pixel-perfect image diffs. Do not use Monte Carlo to test deterministic fixed-pan, cumulative-hazard, or replay-identity invariants.

@@ -12,6 +12,8 @@ It now contains two explicitly separated verification tracks:
 2. **Current Candidate Weight reference track**
    - Pure deterministic fixed-pan reference kernel
    - Public cross-domain packet-contract tests
+   - Current Capture runtime surface: `hasEligibleResponseMode + captureRetention`; legacy `hardValid/captureEligible` is not a canonical required field
+   - Mode-local eligibility derivation protects sibling isolation: one ineligible Mode does not invalidate another eligible Mode
    - Compiled ambient `B/P/E` stage-consumption guards
    - Implemented under `candidate_weight_reference/` with tests under `tests/reference_harness/`
 

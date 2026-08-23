@@ -4,6 +4,7 @@ from .state import (
     TrueNoneSettlement,
     fallback_gate_hits,
     plan_fallback_gate,
+    settle_spawn_commit,
     settle_true_none,
 )
 
@@ -13,5 +14,6 @@ __all__ = [
     "TrueNoneSettlement",
     "fallback_gate_hits",
     "plan_fallback_gate",
+    "settle_spawn_commit",
     "settle_true_none",
 ]

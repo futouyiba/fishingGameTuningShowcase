@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from typing import Any
 
@@ -18,17 +18,29 @@ class ResolvedBehavioralContextSurface:
 @dataclass(frozen=True)
 class CaptureRuntimeSurface:
     capture_retention: float
-    hard_valid: bool
+    has_eligible_response_mode: bool
 
     @property
     def effective_capture(self) -> float:
-        return self.capture_retention if self.hard_valid else 0.0
+        return self.capture_retention if self.has_eligible_response_mode else 0.0
 
 
 def _required(packet: Mapping[str, Any], field: str) -> Any:
     if field not in packet:
         raise ContractViolation("PRODUCER_MISSING_REQUIRED_FIELD", field)
     return packet[field]
+
+
+def derive_has_eligible_response_mode(
+    mode_responses: Iterable[Mapping[str, Any]],
+) -> bool:
+    """Derive the Capture packet gate from mode-local eligibility only."""
+    found_mode = False
+    for response in mode_responses:
+        found_mode = True
+        if bool(_required(response, "modeEligible")):
+            return True
+    return False if found_mode else False
 
 
 def read_readiness_public_surface(
@@ -44,9 +56,12 @@ def read_readiness_public_surface(
 
 
 def read_capture_runtime_surface(packet: Mapping[str, Any]) -> CaptureRuntimeSurface:
-    """Consume only Runtime-required fields from CaptureResponsePacket."""
+    """Consume only Current runtime-required fields from CaptureResponsePacket."""
     retention = float(_required(packet, "captureRetention"))
-    hard_valid = bool(_required(packet, "hardValid"))
+    has_eligible_response_mode = bool(_required(packet, "hasEligibleResponseMode"))
     if not 0.0 <= retention <= 1.0:
         raise ValueError("captureRetention must be in [0, 1]")
-    return CaptureRuntimeSurface(capture_retention=retention, hard_valid=hard_valid)
+    return CaptureRuntimeSurface(
+        capture_retention=retention,
+        has_eligible_response_mode=has_eligible_response_mode,
+    )

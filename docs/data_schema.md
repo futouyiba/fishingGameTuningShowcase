@@ -28,6 +28,7 @@ These Python dataclasses/functions are verification contracts, not production wi
 - `CompiledAmbientCarrier.baked_semantic_stages`: explicit subset of `B/P/E`; missing metadata blocks evaluation
 - Readiness public surface: `globalAvailability`, `activeBehavioralStates`, `motivationProfile`, `enabledResponseModes`
 - Capture runtime surface: `captureRetention`, `hardValid`
+- `calculate_true_pool(...)`: canonical fixed-pan reference result containing total weight, saturation, `spawn_probability_per_opportunity`, and each Species `probability_per_opportunity`
 
 ### Fallback settlement reference
 `FallbackSafetyState` stores only state-machine semantics needed by the deterministic reference:
@@ -67,4 +68,4 @@ The reference runner does not define protobuf/RPC shape, does not recompute Cand
 - `logical_event`
 - `draw_slot`
 
-`replay_stepwise(...)` and `replay_batch(...)` intentionally share the same semantic evaluator and differ only in reference transport request count. The Replay runner calls the Fallback-owned helpers above; it does not own Fallback Gate math or Spawn-Commit lifecycle. The SHA-256 based uniform resolver is only a deterministic fixture primitive and does not define the Production RNG algorithm.
+`replay_stepwise(...)` and `replay_batch(...)` intentionally share the same semantic evaluator and differ only in reference transport request count. Replay canonicalizes Species order, then consumes `calculate_true_pool(...)` for fixed-pan probabilities; it does not independently compute `F`, `max(N,F)` or `P_spawn`. It also calls the Fallback-owned helpers above rather than owning Fallback Gate math or Spawn-Commit lifecycle. The SHA-256 based uniform resolver is only a deterministic fixture primitive and does not define the Production RNG algorithm.

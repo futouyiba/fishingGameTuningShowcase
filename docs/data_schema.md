@@ -47,4 +47,26 @@ Fallback-owned helpers:
 - `settle_spawn_commit(...)`: streak reset / occupancy at Fish Spawn Commit
 - `settle_true_none(...)`: authoritative TrueNone Debt and Fallback settlement order
 
-The reference runner does not define protobuf/RPC shape, does not recompute Candidate Weight, and does not own Tail calibration.
+The Fallback reference does not define protobuf/RPC shape, does not recompute Candidate Weight, and does not own Tail calibration.
+
+### Server replay reference
+`ReplayLease` is a minimal reference carrier:
+- `rng_epoch`
+- `algorithm_version`
+
+`ReplayEntry` contains replayable inputs plus optional non-authoritative debug claims:
+- `opportunity_seq`
+- `candidate_weights`
+- `pan_capacity`
+- `credited_active_delta`
+- `resolved_g_target`
+- `fallback_pool`
+- `client_debug_claims`
+
+`RandomAddress` models logical random identity as:
+- `rng_epoch`
+- `domain`
+- `logical_event`
+- `draw_slot`
+
+`replay_stepwise(...)` and `replay_batch(...)` share one semantic evaluator and differ only in reference transport request count. Replay consumes `calculate_true_pool(...)` for fixed-pan probability surfaces and Fallback-owned helpers for Gate/lifecycle semantics. The SHA-256 based uniform resolver is only a deterministic fixture primitive and does not define the Production RNG algorithm.

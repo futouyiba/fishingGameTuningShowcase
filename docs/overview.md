@@ -1,10 +1,21 @@
 # Overview
 
-This repo exists to turn fishing-sim numeric systems into **verifiable artifacts**:
+This repo exists to turn fishing-sim numeric systems into **verifiable artifacts**.
 
-- Configs (nested JSON) -> Derived env field (`x*y*z*fish`)
-- Tests enforce invariants (determinism, monotonicity, conservation-ish checks)
-- Visual artifacts help humans spot anomalies quickly
+It now contains two explicitly separated verification tracks:
+
+1. **Legacy environment-field track**
+   - Configs (nested JSON) -> derived environment field (`x*y*z*fish`)
+   - Existing visualization and voxel-oriented sanity tests remain useful as historical/precompute tooling.
+   - Those tests do **not** define the current Candidate Weight constitution.
+
+2. **Current Candidate Weight reference track**
+   - Pure deterministic fixed-pan reference kernel
+   - Public cross-domain packet-contract tests
+   - Compiled ambient `B/P/E` stage-consumption guards
+   - Implemented under `candidate_weight_reference/` with tests under `tests/reference_harness/`
+
+The current reference track is intentionally isolated from `compute/`: it must not inherit the legacy invariant that fish weights are normalized to 1 per voxel. Current Candidate Weight semantics are tested independently, and future production adapters should be differential-tested against this reference rather than reusing production functions as their oracle.
 
 See:
 - `docs/data_schema.md`

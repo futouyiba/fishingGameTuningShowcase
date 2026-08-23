@@ -10,13 +10,14 @@ Tests under `tests/reference_harness/` protect the current deterministic contrac
 
 Initial release-blocking coverage:
 - Fixed-pan kernel: unsaturated competitor suppression must not change another species' absolute target roll time; saturated whole-pool scale must preserve composition/throughput; proportional runtime encoding scale (`weights + N`) is invariant.
-- Public packet surface: Readiness consumers only depend on the canonical `ResolvedBehavioralContext` public fields; Capture runtime only consumes `captureRetention` + `hardValid`; missing required fields fail closed with `PRODUCER_MISSING_REQUIRED_FIELD`.
+- Public packet surface: Readiness consumers only depend on the canonical `ResolvedBehavioralContext` public fields; Capture runtime consumes `hasEligibleResponseMode + captureRetention`; missing canonical fields fail closed with `PRODUCER_MISSING_REQUIRED_FIELD`.
+- Mode-local eligibility: `hasEligibleResponseMode = any(modeEligible[m])`; one ineligible Mode cannot kill an eligible sibling, while all Modes ineligible yields effective Capture `0`.
+- Legacy gate isolation: `hardValid / captureEligible` cannot silently replace the Current `hasEligibleResponseMode` required field.
 - Explain isolation: changing internal Readiness or Capture explain-only fields must not change the runtime-facing surface (`CONSUMER_DEPENDS_ON_INTERNAL_EXPLAIN` class of regression).
 - Compiled ambient stage consumption: an artifact that already baked `B/P/E` must not consume those stages again (`DUPLICATE_STAGE_CONSUMPTION`); unknown bake metadata blocks evaluation with `BAKED_STAGE_UNKNOWN`; partial bake consumes only missing stages.
-- Hard invalid remains outside soft capture retention: `hardValid=false` yields effective capture `0` even when `captureRetention>0`.
 
 ## CI gate
-`./verify.sh` remains the repository gate and GitHub Actions runs it on push and pull request. The current reference tests are ordinary pytest tests, so once this branch is evaluated by the existing workflow they run in the same gate as the legacy tests.
+`./verify.sh` remains the repository gate and GitHub Actions runs it on push and pull request. The gate uses non-mutating `ruff format --check`, Ruff lint, and pytest.
 
 A green repository CI means only that the registered tests passed. It does **not** prove production FG runtime compatibility until a production adapter is pinned to a real repo/branch/commit/build and differential-tested against this reference.
 

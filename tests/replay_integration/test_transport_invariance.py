@@ -44,9 +44,9 @@ def test_rp_auth_034_logical_sequence_is_transport_shape_invariant() -> None:
     stepwise = replay_stepwise(state, lease, _transport_fixture())
     batch = replay_batch(state, lease, _transport_fixture())
 
-    assert (
-        stepwise.semantic_signature() == batch.semantic_signature()
-    ), "REPLAY_SEMANTICS_ASSUMED_AS_RPC"
+    assert stepwise.semantic_signature() == batch.semantic_signature(), (
+        "REPLAY_SEMANTICS_ASSUMED_AS_RPC"
+    )
     assert stepwise.transport_request_count == 3
     assert batch.transport_request_count == 1
     assert stepwise.commit_source == "FALLBACK"

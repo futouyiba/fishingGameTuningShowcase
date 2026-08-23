@@ -20,12 +20,25 @@ Tests under `tests/fallback_integration/` protect the state transition between a
 
 Initial release-blocking coverage:
 - Exact Debt: `D += -ln(1-p_spawn)` using the authoritative **post-floor actual** TruePool probability.
+- Fallback Gate planning is owned once in `fallback_reference`: Pool eligibility, monotone `G` application and `P_gate=1-exp(-ΔG)` are not reimplemented by Replay consumers.
+- Fish Spawn Commit lifecycle reset/occupancy is owned once by `settle_spawn_commit(...)`.
 - `RT-FB-017`: if the authoritative Fallback Pool is empty, TrueNone still updates `D`, but `G` must not advance and neither `FALLBACK_GATE` nor `FALLBACK_SPECIES` RNG may be consumed.
 - Retry/idempotency: repeating the same logical `OpportunitySeq` is a no-op even if a Pool becomes available later.
 - Non-empty Pool: once extra hazard is actually offered to a deliverable pool, a Gate miss still advances applied `G` and consumes only the Gate RNG domain.
 - Gate hit: Species RNG is consumed only after Gate hit, then Fallback Fish Spawn Commit ends the No-Spawn streak and enters `OCCUPIED_POST_SPAWN`.
 
 This runner deliberately consumes an upstream `resolved_g_target`; it does not redefine the current adaptive-effective-time / Tail Envelope policy. It also treats `OpportunitySeq` as a logical replay identity, not a per-opportunity RPC requirement.
+
+### Current Server replay reference tests
+Tests under `tests/replay_integration/` protect logical replay semantics independently of transport shape.
+
+Initial release-blocking coverage:
+- `RP-AUTH-034`: step-hook and single-batch transport shapes over the same logical Opportunity sequence must produce the same canonical Candidate digest, `p_spawn`, TrueRoll, Fallback state, RandomAddresses and Fish Spawn Commit boundary. Only request count may differ.
+- Client-derived debug claims are ignored as authority inputs.
+- Candidate insertion order is canonicalized before stochastic branching.
+- Replay consumes Fallback-owned `plan_fallback_gate`, `fallback_gate_hits`, `settle_spawn_commit` and `settle_true_none`; it must not duplicate Fallback Gate math or lifecycle transitions.
+
+The reference `RandomAddress = RngEpoch + Domain + LogicalEvent + DrawSlot` is a semantic address model. The fixture's SHA-256 uniform resolver is not the Production RNG contract.
 
 ## CI gate
 `./verify.sh` remains the repository gate and GitHub Actions runs it on push and pull request. The gate uses non-mutating `ruff format --check`, Ruff lint, and pytest.

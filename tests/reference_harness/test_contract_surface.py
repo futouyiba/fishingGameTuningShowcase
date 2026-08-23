@@ -60,9 +60,7 @@ def test_capture_explain_fields_cannot_change_runtime_surface() -> None:
 
 def test_capture_missing_retention_fails_closed() -> None:
     with pytest.raises(ContractViolation) as exc_info:
-        read_capture_runtime_surface(
-            {"hasEligibleResponseMode": True, "winningMode": "feeding"}
-        )
+        read_capture_runtime_surface({"hasEligibleResponseMode": True, "winningMode": "feeding"})
 
     assert exc_info.value.code == "PRODUCER_MISSING_REQUIRED_FIELD"
     assert exc_info.value.detail == "captureRetention"

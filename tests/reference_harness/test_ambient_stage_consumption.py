@@ -11,21 +11,15 @@ from candidate_weight_reference import (
 
 
 def test_fully_baked_ambient_carrier_continues_only_g_v_c() -> None:
-    carrier = CompiledAmbientCarrier(
-        value=72.0, baked_semantic_stages=frozenset({"B", "P", "E"})
-    )
+    carrier = CompiledAmbientCarrier(value=72.0, baked_semantic_stages=frozenset({"B", "P", "E"}))
     ambient = resolve_ambient_carrier(carrier, {})
-    final_weight = continue_candidate_chain(
-        ambient, aggregation=1.10, readiness=0.80, capture=0.50
-    )
+    final_weight = continue_candidate_chain(ambient, aggregation=1.10, readiness=0.80, capture=0.50)
 
     assert final_weight == pytest.approx(31.68)
 
 
 def test_duplicate_baked_stage_consumption_is_release_blocker() -> None:
-    carrier = CompiledAmbientCarrier(
-        value=72.0, baked_semantic_stages=frozenset({"B", "P", "E"})
-    )
+    carrier = CompiledAmbientCarrier(value=72.0, baked_semantic_stages=frozenset({"B", "P", "E"}))
 
     with pytest.raises(ContractViolation) as exc_info:
         resolve_ambient_carrier(carrier, {"E": 0.5})

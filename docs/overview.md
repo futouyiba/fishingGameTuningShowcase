@@ -2,7 +2,7 @@
 
 This repo exists to turn fishing-sim numeric systems into **verifiable artifacts**.
 
-It now contains three explicitly separated verification tracks:
+It now contains four explicitly separated verification tracks:
 
 1. **Legacy environment-field track**
    - Configs (nested JSON) -> derived environment field (`x*y*z*fish`)
@@ -22,7 +22,15 @@ It now contains three explicitly separated verification tracks:
    - Tail/Envelope policy resolves the desired `G_target` upstream; this runner only applies Debt, Pool eligibility, applied-hazard, RNG-domain and Spawn-Commit ordering
    - Implemented under `fallback_reference/` with tests under `tests/fallback_integration/`
 
-The current reference tracks are intentionally isolated from `compute/`: they must not inherit the legacy invariant that fish weights are normalized to 1 per voxel. Current Candidate Weight and Fallback settlement semantics are tested independently, and future production adapters should be differential-tested against these references rather than reusing production functions as their oracle.
+4. **Current Server replay reference track**
+   - Pure deterministic ordered replay runner over reference-only `ReplayEntry` inputs
+   - Uses addressed randomness keyed by `RngEpoch + Domain + LogicalEvent + DrawSlot`; it does not claim to be the production RNG implementation
+   - Ignores Client-derived debug claims when deriving authoritative results
+   - Canonicalizes candidate order before digest/TrueRoll
+   - Verifies that step-hook vs one batch replay window produce the same semantic result even when transport request count differs
+   - Implemented under `replay_reference/` with tests under `tests/replay_integration/`
+
+The current reference tracks are intentionally isolated from `compute/`: they must not inherit the legacy invariant that fish weights are normalized to 1 per voxel. Current Candidate Weight, Fallback settlement, and replay semantics are tested independently, and future production adapters should be differential-tested against these references rather than reusing production functions as their oracle.
 
 See:
 - `docs/data_schema.md`

@@ -3,23 +3,37 @@
 ## Verification tracks
 
 ### Legacy environment-field tests
-Existing tests under `tests/test_sanity.py` and `tests/test_determinism.py` protect the older environment-field prototype. In particular, `test_weights_are_normalized_per_voxel` is a legacy/precompute invariant and must not be generalized into the current Candidate Weight model.
+Existing tests under `tests/test_sanity.py` and `tests/test_determinism.py` protect the older environment-field prototype. `test_weights_are_normalized_per_voxel` remains a legacy/precompute invariant and must not be generalized into Current Candidate Weight.
 
 ### Current Candidate Weight reference tests
-Tests under `tests/reference_harness/` protect the current deterministic contract without importing production-runtime functions.
+Tests under `tests/reference_harness/` protect the current deterministic contract.
 
-Initial release-blocking coverage:
-- Fixed-pan kernel: unsaturated competitor suppression must not change another species' absolute target roll time; saturated whole-pool scale must preserve composition/throughput; proportional runtime encoding scale (`weights + N`) is invariant.
-- Public packet surface: Readiness consumers only depend on the canonical `ResolvedBehavioralContext` public fields; Capture runtime consumes `hasEligibleResponseMode + captureRetention`; missing canonical fields fail closed with `PRODUCER_MISSING_REQUIRED_FIELD`.
-- Mode-local eligibility: `hasEligibleResponseMode = any(modeEligible[m])`; one ineligible Mode cannot kill an eligible sibling, while all Modes ineligible yields effective Capture `0`.
-- Legacy gate isolation: `hardValid / captureEligible` cannot silently replace the Current `hasEligibleResponseMode` required field.
-- Explain isolation: changing internal Readiness or Capture explain-only fields must not change the runtime-facing surface (`CONSUMER_DEPENDS_ON_INTERNAL_EXPLAIN` class of regression).
-- Compiled ambient stage consumption: an artifact that already baked `B/P/E` must not consume those stages again (`DUPLICATE_STAGE_CONSUMPTION`); unknown bake metadata blocks evaluation with `BAKED_STAGE_UNKNOWN`; partial bake consumes only missing stages.
+Release-blocking coverage includes:
+- fixed-pan kernel identities and scale invariance;
+- Readiness public packet isolation;
+- Current Capture runtime surface `hasEligibleResponseMode + captureRetention`;
+- mode-local sibling isolation and all-mode-ineligible behavior;
+- legacy `hardValid / captureEligible` cannot replace the canonical packet gate;
+- explicit B/P/E baked-stage consumption and duplicate-stage blockers.
+
+### Current Fallback settlement reference tests
+Tests under `tests/fallback_integration/` protect the state transition between authoritative replay TrueNone results and Fallback safety state.
+
+Coverage includes:
+- exact Debt: `D += -ln(1-p_spawn)` from authoritative post-floor actual TruePool probability;
+- Fallback-owned Gate planning: Pool eligibility, monotone `G`, `P_gate=1-exp(-ΔG)`;
+- Fish Spawn Commit lifecycle reset via `settle_spawn_commit(...)`;
+- `RT-FB-017`: empty Pool still updates Debt but cannot advance `G` or consume Gate/Species RNG;
+- retry/idempotency for the same logical `OpportunitySeq`;
+- Gate miss applies deliverable extra hazard but consumes no Species RNG;
+- Gate hit consumes Species RNG and enters `OCCUPIED_POST_SPAWN`.
+
+This runner consumes upstream `resolved_g_target`; it does not redefine adaptive-effective-time / Tail Envelope policy. `OpportunitySeq` is a logical replay identity, not a per-opportunity RPC requirement.
 
 ## CI gate
-`./verify.sh` remains the repository gate and GitHub Actions runs it on push and pull request. The gate uses non-mutating `ruff format --check`, Ruff lint, and pytest.
+`./verify.sh` is the repository gate and uses non-mutating `ruff format --check`, Ruff lint, and pytest.
 
-A green repository CI means only that the registered tests passed. It does **not** prove production FG runtime compatibility until a production adapter is pinned to a real repo/branch/commit/build and differential-tested against this reference.
+A green repository CI proves only the registered Reference tests. Production compatibility still requires a pinned Production adapter and differential execution against these references.
 
 ## Regression policy
-Store small deterministic fixtures and numeric results. Prefer numeric assertions over pixel-perfect image diffs. Do not use Monte Carlo to test deterministic fixed-pan identities.
+Store small deterministic fixtures and numeric results. Prefer numeric assertions over pixel-perfect image diffs. Do not use Monte Carlo to test deterministic fixed-pan or cumulative-hazard identities.

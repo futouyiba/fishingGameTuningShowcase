@@ -2,7 +2,7 @@
 
 This repo exists to turn fishing-sim numeric systems into **verifiable artifacts**.
 
-It now contains two explicitly separated verification tracks:
+It now contains three explicitly separated verification tracks:
 
 1. **Legacy environment-field track**
    - Configs (nested JSON) -> derived environment field (`x*y*z*fish`)
@@ -17,7 +17,14 @@ It now contains two explicitly separated verification tracks:
    - Compiled ambient `B/P/E` stage-consumption guards
    - Implemented under `candidate_weight_reference/` with tests under `tests/reference_harness/`
 
-The current reference track is intentionally isolated from `compute/`: it must not inherit the legacy invariant that fish weights are normalized to 1 per voxel. Current Candidate Weight semantics are tested independently, and future production adapters should be differential-tested against this reference rather than reusing production functions as their oracle.
+3. **Current Fallback settlement reference track**
+   - Pure deterministic `FallbackSafetyState` transition runner
+   - Consumes authoritative replay results rather than transport/RPC semantics
+   - `p_spawn` is the already-resolved **post-floor actual TruePool probability**; this runner does not recompute Candidate Weight
+   - Tail/Envelope policy resolves `G_target` upstream; Fallback owns Pool eligibility, applied-hazard/Gate math and Spawn-Commit lifecycle helpers
+   - Implemented under `fallback_reference/` with tests under `tests/fallback_integration/`
+
+The current reference tracks are intentionally isolated from `compute/`: they must not inherit the legacy invariant that fish weights are normalized to 1 per voxel. Future production adapters should be differential-tested against these references rather than reusing production functions as their oracle.
 
 See:
 - `docs/data_schema.md`

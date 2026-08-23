@@ -31,7 +31,9 @@ def test_saturated_uniform_weight_scale_preserves_probabilities_and_times() -> N
 
 def test_runtime_integer_scale_of_weights_and_pan_capacity_is_invariant() -> None:
     before = calculate_true_pool({"A": 100, "B": 50}, pan_capacity=1000, opportunity_rate_per_sec=2)
-    after = calculate_true_pool({"A": 1000, "B": 500}, pan_capacity=10000, opportunity_rate_per_sec=2)
+    after = calculate_true_pool(
+        {"A": 1000, "B": 500}, pan_capacity=10000, opportunity_rate_per_sec=2
+    )
 
     assert after.spawn_probability_per_opportunity == pytest.approx(
         before.spawn_probability_per_opportunity

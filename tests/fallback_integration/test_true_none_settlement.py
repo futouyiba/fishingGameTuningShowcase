@@ -8,6 +8,7 @@ from fallback_reference import (
     FallbackSafetyState,
     fallback_gate_hits,
     plan_fallback_gate,
+    settle_spawn_commit,
     settle_true_none,
 )
 
@@ -52,6 +53,23 @@ def test_fallback_gate_plan_owns_pool_and_hazard_semantics() -> None:
     assert deliverable.gate_probability == pytest.approx(1.0 - math.exp(-0.55))
     assert fallback_gate_hits(deliverable, 0.0) is True
     assert fallback_gate_hits(deliverable, 0.99) is False
+
+
+def test_true_spawn_commit_ends_fallback_streak() -> None:
+    after = settle_spawn_commit(
+        FallbackSafetyState(
+            debt=0.4,
+            active_time_credited=90.0,
+            applied_extra_hazard=0.25,
+        ),
+        opportunity_seq=9,
+    )
+
+    assert after.phase == "OCCUPIED_POST_SPAWN"
+    assert after.debt == 0.0
+    assert after.active_time_credited == 0.0
+    assert after.applied_extra_hazard == 0.0
+    assert after.last_processed_opportunity_seq == 9
 
 
 def test_rt_fb_017_empty_pool_does_not_burn_applied_hazard_or_rng() -> None:

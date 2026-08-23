@@ -68,9 +68,7 @@ def test_replay_uses_candidate_weight_reference_probability_surface() -> None:
         (ReplayEntry(30, weights, pan_capacity),),
     )
 
-    assert run.entries[0].p_spawn == pytest.approx(
-        expected.spawn_probability_per_opportunity
-    )
+    assert run.entries[0].p_spawn == pytest.approx(expected.spawn_probability_per_opportunity)
     assert run.entries[0].p_spawn == pytest.approx(0.15)
 
 

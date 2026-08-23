@@ -10,6 +10,7 @@ Tests under `tests/reference_harness/` protect the current deterministic contrac
 
 Initial release-blocking coverage:
 - Fixed-pan kernel: unsaturated competitor suppression must not change another species' absolute target roll time; saturated whole-pool scale must preserve composition/throughput; proportional runtime encoding scale (`weights + N`) is invariant.
+- `calculate_true_pool(...)` is the single reference probability surface for `F`, `max(N,F)`, `P_spawn`, Species per-opportunity probabilities, purity and roll-time math.
 - Public packet surface: Readiness consumers only depend on the canonical `ResolvedBehavioralContext` public fields; Capture runtime only consumes `captureRetention` + `hardValid`; missing required fields fail closed with `PRODUCER_MISSING_REQUIRED_FIELD`.
 - Explain isolation: changing internal Readiness or Capture explain-only fields must not change the runtime-facing surface (`CONSUMER_DEPENDS_ON_INTERNAL_EXPLAIN` class of regression).
 - Compiled ambient stage consumption: an artifact that already baked `B/P/E` must not consume those stages again (`DUPLICATE_STAGE_CONSUMPTION`); unknown bake metadata blocks evaluation with `BAKED_STAGE_UNKNOWN`; partial bake consumes only missing stages.
@@ -34,8 +35,9 @@ Tests under `tests/replay_integration/` protect logical replay semantics indepen
 
 Initial release-blocking coverage:
 - `RP-AUTH-034`: step-hook and single-batch transport shapes over the same logical Opportunity sequence must produce the same canonical Candidate digest, `p_spawn`, TrueRoll, Fallback state, RandomAddresses and Fish Spawn Commit boundary. Only request count may differ.
+- Replay's authoritative `p_spawn` must equal Candidate Weight `calculate_true_pool(...).spawn_probability_per_opportunity`; Replay must not reimplement `F/max(N,F)` / `F/N` probability math.
 - Client-derived debug claims are ignored as authority inputs.
-- Candidate insertion order is canonicalized before stochastic branching.
+- Candidate insertion order is canonicalized before stochastic branching; stochastic branch thresholds consume Candidate-owned Species `probability_per_opportunity` values.
 - Replay consumes Fallback-owned `plan_fallback_gate`, `fallback_gate_hits`, `settle_spawn_commit` and `settle_true_none`; it must not duplicate Fallback Gate math or lifecycle transitions.
 
 The reference `RandomAddress = RngEpoch + Domain + LogicalEvent + DrawSlot` is a semantic address model. The fixture's SHA-256 uniform resolver is not the Production RNG contract.

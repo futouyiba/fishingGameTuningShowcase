@@ -2,7 +2,7 @@
 
 This repo exists to turn fishing-sim numeric systems into **verifiable artifacts**.
 
-It now contains three explicitly separated verification tracks:
+It now contains four explicitly separated verification tracks:
 
 1. **Legacy environment-field track**
    - Configs (nested JSON) -> derived environment field (`x*y*z*fish`)
@@ -23,6 +23,15 @@ It now contains three explicitly separated verification tracks:
    - `p_spawn` is the already-resolved **post-floor actual TruePool probability**; this runner does not recompute Candidate Weight
    - Tail/Envelope policy resolves `G_target` upstream; Fallback owns Pool eligibility, applied-hazard/Gate math and Spawn-Commit lifecycle helpers
    - Implemented under `fallback_reference/` with tests under `tests/fallback_integration/`
+
+4. **Current Server replay reference track**
+   - Replays ordered logical `OpportunitySeq` entries independently of transport request count
+   - Uses reference `RandomAddress = RngEpoch + Domain + LogicalEvent + DrawSlot`
+   - Ignores Client-derived debug claims as authority inputs and canonicalizes Candidate ordering before stochastic branching
+   - Consumes Candidate Weight `calculate_true_pool(...)` for fixed-pan probabilities rather than recalculating `F/max(N,F)` or `P_spawn`
+   - Calls Fallback-owned planning, Gate and Spawn-Commit lifecycle helpers rather than duplicating Fallback formulas/state transitions
+   - Protects `RP-AUTH-034` step-hook vs batch replay transport-shape invariance
+   - Implemented under `replay_reference/` with tests under `tests/replay_integration/`
 
 The current reference tracks are intentionally isolated from `compute/`: they must not inherit the legacy invariant that fish weights are normalized to 1 per voxel. Future production adapters should be differential-tested against these references rather than reusing production functions as their oracle.
 

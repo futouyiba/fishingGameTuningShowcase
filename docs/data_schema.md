@@ -19,3 +19,15 @@ Fields per pond:
 - `pond_id`
 - `water_temp_profile_c`: `{surface, thermocline_depth, gradient}`
 - `weather`: placeholder for future
+
+## Current reference-only contract surfaces
+These Python dataclasses/functions are verification contracts, not production wire schemas.
+
+### Candidate Weight reference
+- `CompiledAmbientCarrier.value`
+- `CompiledAmbientCarrier.baked_semantic_stages`: explicit subset of `B/P/E`; missing metadata blocks evaluation
+- Readiness public surface: `globalAvailability`, `activeBehavioralStates`, `motivationProfile`, `enabledResponseModes`
+- Capture runtime surface: `hasEligibleResponseMode`, `captureRetention`
+- `derive_has_eligible_response_mode(modeResponses[])`: derives the packet gate as `any(modeEligible[m])`; one false Mode cannot invalidate an eligible sibling
+- legacy `hardValid / captureEligible` may exist in adapters as compatibility aliases but do not satisfy the Current canonical reader
+- `calculate_true_pool(...)`: canonical fixed-pan reference result containing total weight, saturation, `spawn_probability_per_opportunity`, and each Species `probability_per_opportunity`

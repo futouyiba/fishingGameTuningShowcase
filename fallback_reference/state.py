@@ -21,6 +21,14 @@ class FallbackSafetyState:
 
 
 @dataclass(frozen=True)
+class FallbackGatePlan:
+    g_target: float
+    delta_g: float
+    gate_probability: float
+    should_attempt: bool
+
+
+@dataclass(frozen=True)
 class TrueNoneSettlement:
     state: FallbackSafetyState
     opportunity_seq: int
@@ -47,6 +55,48 @@ def _choose_species(pool: tuple[str, ...], u: float) -> str:
     u = _unit_interval(u, "fallback_species_u", allow_one=False)
     index = min(int(u * len(pool)), len(pool) - 1)
     return pool[index]
+
+
+def plan_fallback_gate(
+    state: FallbackSafetyState,
+    *,
+    resolved_g_target: float,
+    fallback_pool: tuple[str, ...],
+) -> FallbackGatePlan:
+    """Resolve whether this settlement may apply extra fallback hazard.
+
+    The plan owns the current Fallback semantics that a non-empty deliverable
+    pool is required before `G` can advance or a gate RNG draw can be consumed.
+    """
+    resolved_g_target = float(resolved_g_target)
+    if not isfinite(resolved_g_target) or resolved_g_target < 0.0:
+        raise ValueError("resolved_g_target must be finite and >= 0")
+
+    g_target = max(state.applied_extra_hazard, resolved_g_target)
+    pending_delta_g = g_target - state.applied_extra_hazard
+    should_attempt = bool(fallback_pool) and pending_delta_g > 0.0
+    if not should_attempt:
+        return FallbackGatePlan(
+            g_target=state.applied_extra_hazard,
+            delta_g=0.0,
+            gate_probability=0.0,
+            should_attempt=False,
+        )
+
+    return FallbackGatePlan(
+        g_target=g_target,
+        delta_g=pending_delta_g,
+        gate_probability=1.0 - exp(-pending_delta_g),
+        should_attempt=True,
+    )
+
+
+def fallback_gate_hits(plan: FallbackGatePlan, gate_u: float) -> bool:
+    """Evaluate the gate branch without duplicating Fallback probability math."""
+    if not plan.should_attempt:
+        return False
+    gate_u = _unit_interval(gate_u, "fallback_gate_u", allow_one=False)
+    return gate_u < plan.gate_probability
 
 
 def settle_true_none(
@@ -91,13 +141,13 @@ def settle_true_none(
     credited_active_delta = float(credited_active_delta)
     if not isfinite(credited_active_delta) or credited_active_delta < 0.0:
         raise ValueError("credited_active_delta must be finite and >= 0")
-    resolved_g_target = float(resolved_g_target)
-    if not isfinite(resolved_g_target) or resolved_g_target < 0.0:
-        raise ValueError("resolved_g_target must be finite and >= 0")
 
+    gate_plan = plan_fallback_gate(
+        state,
+        resolved_g_target=resolved_g_target,
+        fallback_pool=fallback_pool,
+    )
     delta_debt = -log1p(-p_spawn)
-    g_target = max(state.applied_extra_hazard, resolved_g_target)
-    delta_g = g_target - state.applied_extra_hazard
     base_state = replace(
         state,
         debt=state.debt + delta_debt,
@@ -119,7 +169,7 @@ def settle_true_none(
             alarms=("FallbackPoolEmpty",),
         )
 
-    if delta_g <= 0.0:
+    if not gate_plan.should_attempt:
         return TrueNoneSettlement(
             state=base_state,
             opportunity_seq=opportunity_seq,
@@ -135,11 +185,9 @@ def settle_true_none(
 
     if fallback_gate_u is None:
         raise ContractViolation("PRODUCER_MISSING_REQUIRED_FIELD", "fallback_gate_u")
-    gate_u = _unit_interval(fallback_gate_u, "fallback_gate_u", allow_one=False)
-    gate_probability = 1.0 - exp(-delta_g)
-    gate_hit = gate_u < gate_probability
+    gate_hit = fallback_gate_hits(gate_plan, fallback_gate_u)
 
-    applied_state = replace(base_state, applied_extra_hazard=g_target)
+    applied_state = replace(base_state, applied_extra_hazard=gate_plan.g_target)
     rng_calls: tuple[str, ...] = ("FALLBACK_GATE",)
     species: str | None = None
 
@@ -161,8 +209,8 @@ def settle_true_none(
         opportunity_seq=opportunity_seq,
         duplicate=False,
         delta_debt=delta_debt,
-        delta_g=delta_g,
-        fallback_gate_probability=gate_probability,
+        delta_g=gate_plan.delta_g,
+        fallback_gate_probability=gate_plan.gate_probability,
         fallback_gate_hit=gate_hit,
         fallback_species=species,
         rng_calls=rng_calls,

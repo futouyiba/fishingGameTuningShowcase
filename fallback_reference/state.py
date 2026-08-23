@@ -99,6 +99,26 @@ def fallback_gate_hits(plan: FallbackGatePlan, gate_u: float) -> bool:
     return gate_u < plan.gate_probability
 
 
+def settle_spawn_commit(
+    state: FallbackSafetyState,
+    *,
+    opportunity_seq: int,
+) -> FallbackSafetyState:
+    """End the current no-spawn streak at the Fish Spawn Commit boundary."""
+    if state.phase != "SEARCHING":
+        raise ContractViolation("OCCUPIED_HAS_NO_OPPORTUNITY")
+    if opportunity_seq < 0:
+        raise ValueError("opportunity_seq must be >= 0")
+    return replace(
+        state,
+        phase="OCCUPIED_POST_SPAWN",
+        debt=0.0,
+        active_time_credited=0.0,
+        applied_extra_hazard=0.0,
+        last_processed_opportunity_seq=opportunity_seq,
+    )
+
+
 def settle_true_none(
     state: FallbackSafetyState,
     *,
@@ -196,12 +216,9 @@ def settle_true_none(
             raise ContractViolation("PRODUCER_MISSING_REQUIRED_FIELD", "fallback_species_u")
         species = _choose_species(fallback_pool, fallback_species_u)
         rng_calls += ("FALLBACK_SPECIES",)
-        applied_state = replace(
+        applied_state = settle_spawn_commit(
             applied_state,
-            phase="OCCUPIED_POST_SPAWN",
-            debt=0.0,
-            active_time_credited=0.0,
-            applied_extra_hazard=0.0,
+            opportunity_seq=opportunity_seq,
         )
 
     return TrueNoneSettlement(

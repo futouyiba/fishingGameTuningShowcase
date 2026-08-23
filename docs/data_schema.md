@@ -39,12 +39,32 @@ These Python dataclasses/functions are verification contracts, not production wi
 - `applied_extra_hazard`: actually applied fallback hazard `G`
 - `last_processed_opportunity_seq`: logical replay/idempotency identity
 
-`settle_true_none(...)` consumes:
-- `opportunity_seq`
-- authoritative **post-floor actual** `p_spawn`
-- `credited_active_delta`
-- `resolved_g_target` from the current Tail/Envelope policy resolver
-- immutable authoritative `fallback_pool`
-- deterministic test-hook values for `FALLBACK_GATE` / `FALLBACK_SPECIES` RNG
+Fallback-owned helpers:
+- `plan_fallback_gate(...)`: owns non-empty Pool eligibility, monotone applied-`G` delta and Gate probability
+- `fallback_gate_hits(...)`: owns Gate branch comparison semantics
+- `settle_spawn_commit(...)`: owns reset/occupancy transition at Fish Spawn Commit
+- `settle_true_none(...)`: owns authoritative TrueNone Debt and Fallback settlement order
 
 The reference runner does not define protobuf/RPC shape, does not recompute Candidate Weight, and does not own Tail calibration.
+
+### Server replay reference
+`ReplayLease` is a minimal reference carrier:
+- `rng_epoch`
+- `algorithm_version`
+
+`ReplayEntry` contains replayable reference inputs plus optional non-authoritative debug claims:
+- `opportunity_seq`
+- `candidate_weights`
+- `pan_capacity`
+- `credited_active_delta`
+- `resolved_g_target`
+- `fallback_pool`
+- `client_debug_claims`
+
+`RandomAddress` models logical random identity as:
+- `rng_epoch`
+- `domain`
+- `logical_event`
+- `draw_slot`
+
+`replay_stepwise(...)` and `replay_batch(...)` intentionally share the same semantic evaluator and differ only in reference transport request count. The Replay runner calls the Fallback-owned helpers above; it does not own Fallback Gate math or Spawn-Commit lifecycle. The SHA-256 based uniform resolver is only a deterministic fixture primitive and does not define the Production RNG algorithm.

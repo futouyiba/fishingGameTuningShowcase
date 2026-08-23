@@ -4,10 +4,17 @@ from collections.abc import Mapping
 from dataclasses import dataclass, replace
 from hashlib import sha256
 from json import dumps
-from math import exp, isfinite
+from math import isfinite
 from typing import Any
 
-from fallback_reference import FallbackSafetyState, TrueNoneSettlement, settle_true_none
+from fallback_reference import (
+    FallbackSafetyState,
+    TrueNoneSettlement,
+    fallback_gate_hits,
+    plan_fallback_gate,
+    settle_spawn_commit,
+    settle_true_none,
+)
 
 
 @dataclass(frozen=True)
@@ -117,20 +124,6 @@ def _true_roll(
     return p_spawn, result, address, _candidate_digest(weights, entry.pan_capacity)
 
 
-def _spawn_commit_state(
-    state: FallbackSafetyState,
-    opportunity_seq: int,
-) -> FallbackSafetyState:
-    return replace(
-        state,
-        phase="OCCUPIED_POST_SPAWN",
-        debt=0.0,
-        active_time_credited=0.0,
-        applied_extra_hazard=0.0,
-        last_processed_opportunity_seq=opportunity_seq,
-    )
-
-
 def _run(
     state: FallbackSafetyState,
     lease: ReplayLease,
@@ -156,7 +149,10 @@ def _run(
             commit_species = true_result.split(":", 1)[1]
             commit_seq = entry.opportunity_seq
             commit_source = "TRUE"
-            state = _spawn_commit_state(state, entry.opportunity_seq)
+            state = settle_spawn_commit(
+                state,
+                opportunity_seq=entry.opportunity_seq,
+            )
             results.append(
                 AuthoritativeEntryResult(
                     entry.opportunity_seq,
@@ -169,12 +165,14 @@ def _run(
             )
             break
 
-        delta_g = (
-            max(state.applied_extra_hazard, entry.resolved_g_target) - state.applied_extra_hazard
+        gate_plan = plan_fallback_gate(
+            state,
+            resolved_g_target=entry.resolved_g_target,
+            fallback_pool=entry.fallback_pool,
         )
         gate_u = None
         species_u = None
-        if entry.fallback_pool and delta_g > 0.0:
+        if gate_plan.should_attempt:
             gate_address = RandomAddress(
                 lease.rng_epoch,
                 "FALLBACK_GATE",
@@ -184,7 +182,7 @@ def _run(
             gate_u = _deterministic_u(gate_address)
             entry_addresses.append(gate_address)
             addresses.append(gate_address)
-            if gate_u < 1.0 - exp(-delta_g):
+            if fallback_gate_hits(gate_plan, gate_u):
                 species_address = RandomAddress(
                     lease.rng_epoch,
                     "FALLBACK_SPECIES",

@@ -28,7 +28,17 @@ Coverage includes:
 - Gate miss applies deliverable extra hazard but consumes no Species RNG;
 - Gate hit consumes Species RNG and enters `OCCUPIED_POST_SPAWN`.
 
-This runner consumes upstream `resolved_g_target`; it does not redefine adaptive-effective-time / Tail Envelope policy. `OpportunitySeq` is a logical replay identity, not a per-opportunity RPC requirement.
+### Current Server replay reference tests
+Tests under `tests/replay_integration/` protect logical replay semantics independently of transport shape.
+
+Coverage includes:
+- `RP-AUTH-034`: step-hook and single-batch paths over the same logical Opportunity sequence must produce the same canonical Candidate digest, `p_spawn`, TrueRoll, Fallback state, RandomAddresses and Fish Spawn Commit boundary; only request count may differ;
+- Replay authoritative `p_spawn` must equal Candidate Weight `calculate_true_pool(...).spawn_probability_per_opportunity`;
+- Client-derived debug claims are ignored as authority inputs;
+- Candidate insertion order is canonicalized before stochastic branching;
+- Replay consumes Fallback-owned `plan_fallback_gate`, `fallback_gate_hits`, `settle_spawn_commit` and `settle_true_none`, rather than duplicating Fallback math/lifecycle.
+
+The reference `RandomAddress = RngEpoch + Domain + LogicalEvent + DrawSlot` is a semantic address model. The fixture SHA-256 uniform resolver is not the Production RNG contract.
 
 ## CI gate
 `./verify.sh` is the repository gate and uses non-mutating `ruff format --check`, Ruff lint, and pytest.

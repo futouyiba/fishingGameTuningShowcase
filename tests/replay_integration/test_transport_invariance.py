@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import pytest
+
+from candidate_weight_reference import calculate_true_pool
 from fallback_reference import FallbackSafetyState
 from replay_reference import ReplayEntry, ReplayLease, replay_batch, replay_stepwise
 
@@ -52,6 +55,23 @@ def test_rp_auth_034_logical_sequence_is_transport_shape_invariant() -> None:
     assert stepwise.commit_source == "FALLBACK"
     assert stepwise.commit_seq == 3
     assert len(stepwise.entries) == 3
+
+
+def test_replay_uses_candidate_weight_reference_probability_surface() -> None:
+    weights = {"A": 100.0, "B": 50.0}
+    pan_capacity = 1000.0
+    expected = calculate_true_pool(weights, pan_capacity)
+
+    run = replay_batch(
+        FallbackSafetyState(),
+        ReplayLease("epoch-candidate-owner"),
+        (ReplayEntry(30, weights, pan_capacity),),
+    )
+
+    assert run.entries[0].p_spawn == pytest.approx(
+        expected.spawn_probability_per_opportunity
+    )
+    assert run.entries[0].p_spawn == pytest.approx(0.15)
 
 
 def test_client_debug_claims_are_not_authority_inputs() -> None:

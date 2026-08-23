@@ -48,3 +48,22 @@ These Python dataclasses/functions are verification contracts, not production wi
 - deterministic test-hook values for `FALLBACK_GATE` / `FALLBACK_SPECIES` RNG
 
 The reference runner does not define protobuf/RPC shape, does not recompute Candidate Weight, and does not own Tail calibration.
+
+### Server replay reference
+`ReplayLease` currently pins a reference `rng_epoch` plus a reference algorithm-version label. It is not a production lease schema.
+
+`ReplayEntry` contains authoritative-replayable reference inputs:
+- logical `opportunity_seq`
+- candidate weights + `pan_capacity` used by the reference TrueRoll kernel
+- credited active-time delta already accepted for this reference replay
+- resolved `G_target`
+- immutable fallback pool snapshot
+- optional Client debug claims, which are explicitly ignored by authoritative derivation
+
+Reference randomness is addressed by:
+- `rng_epoch`
+- `domain`
+- logical event (`opportunity_seq` for current TrueRoll/Fallback fixtures)
+- `draw_slot`
+
+The reference resolver uses a deterministic hash only to make fixtures reproducible. It does **not** define the production RNG library or cryptographic contract.

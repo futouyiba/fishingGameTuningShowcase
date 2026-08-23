@@ -13,6 +13,7 @@ It now contains four explicitly separated verification tracks:
    - Pure deterministic fixed-pan reference kernel
    - Public cross-domain packet-contract tests
    - Compiled ambient `B/P/E` stage-consumption guards
+   - `calculate_true_pool(...)` is the single reference owner for `F`, `max(N,F)`, `P_spawn`, species per-opportunity probability, purity and roll-time math
    - Implemented under `candidate_weight_reference/` with tests under `tests/reference_harness/`
 
 3. **Current Fallback settlement reference track**
@@ -26,6 +27,7 @@ It now contains four explicitly separated verification tracks:
    - Replays ordered logical `OpportunitySeq` entries independently of transport request count
    - Uses reference `RandomAddress = RngEpoch + Domain + LogicalEvent + DrawSlot`
    - Ignores Client-derived debug claims as authority inputs and canonicalizes Candidate ordering before stochastic branching
+   - Consumes Candidate Weight `calculate_true_pool(...)` for fixed-pan probabilities rather than recalculating `F/max(N,F)` or `P_spawn`
    - Calls Fallback-owned planning, Gate and Spawn-Commit lifecycle helpers rather than duplicating Fallback formulas/state transitions
    - Protects `RP-AUTH-034` step-hook vs batch replay transport-shape invariance
    - Implemented under `replay_reference/` with tests under `tests/replay_integration/`

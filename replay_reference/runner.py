@@ -68,8 +68,7 @@ class ReplayRun:
 
 def _deterministic_u(address: RandomAddress) -> float:
     payload = (
-        f"{address.rng_epoch}|{address.domain}|"
-        f"{address.logical_event}|{address.draw_slot}"
+        f"{address.rng_epoch}|{address.domain}|{address.logical_event}|{address.draw_slot}"
     ).encode()
     raw = sha256(payload).digest()[:8]
     return int.from_bytes(raw, "big") / 2**64
@@ -171,8 +170,7 @@ def _run(
             break
 
         delta_g = (
-            max(state.applied_extra_hazard, entry.resolved_g_target)
-            - state.applied_extra_hazard
+            max(state.applied_extra_hazard, entry.resolved_g_target) - state.applied_extra_hazard
         )
         gate_u = None
         species_u = None

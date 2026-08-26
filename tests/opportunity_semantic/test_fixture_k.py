@@ -22,9 +22,7 @@ def _fixture(slots, policies, trace, phase_masks=None):
     return OpportunitySemanticFixture(
         active_channel_ref="channel-1",
         formation_policy=FormationPolicy(tuple(slots)),
-        evaluation_policies={
-            policy.evaluation_policy_id: policy for policy in policies
-        },
+        evaluation_policies={policy.evaluation_policy_id: policy for policy in policies},
         semantic_source_trace=tuple(trace),
         phase_masks={} if phase_masks is None else phase_masks,
     )
@@ -225,12 +223,8 @@ def test_k5_once_per_scope_and_no_future_duration_leakage():
     ]
     masks = {"pause_only": frozenset({"pause"})}
 
-    result_short = resolve_opportunity_semantic_fixture(
-        _fixture([slot], [policy], short, masks)
-    )
-    result_long = resolve_opportunity_semantic_fixture(
-        _fixture([slot], [policy], long, masks)
-    )
+    result_short = resolve_opportunity_semantic_fixture(_fixture([slot], [policy], short, masks))
+    result_long = resolve_opportunity_semantic_fixture(_fixture([slot], [policy], long, masks))
 
     assert len(result_short) == len(result_long) == 1
     assert result_short[0].occurrence_logical_time == pytest.approx(0.3)
@@ -368,9 +362,7 @@ def test_k8_join_before_reduce_blocks_phantom_mass():
             traversal_mass=1.0,
         ),
     ]
-    opportunity = resolve_opportunity_semantic_fixture(
-        _fixture([slot], [policy], trace)
-    )[0]
+    opportunity = resolve_opportunity_semantic_fixture(_fixture([slot], [policy], trace))[0]
     stub = {
         "s1": {"A": SupportDomainValue(1.0, 0.0)},
         "s2": {"A": SupportDomainValue(0.0, 1.0)},
@@ -421,9 +413,7 @@ def test_k9_support_species_coverage_mismatch_fails_closed():
             traversal_mass=1.0,
         ),
     ]
-    opportunity = resolve_opportunity_semantic_fixture(
-        _fixture([slot], [policy], trace)
-    )[0]
+    opportunity = resolve_opportunity_semantic_fixture(_fixture([slot], [policy], trace))[0]
     stub = {
         "s1": {"A": SupportDomainValue(1.0, 1.0)},
         "s2": {
@@ -473,9 +463,7 @@ def test_k10_candidate_handoff_feeds_existing_true_pool_kernel():
             traversal_mass=3.0,
         ),
     ]
-    opportunity = resolve_opportunity_semantic_fixture(
-        _fixture([slot], [policy], trace)
-    )[0]
+    opportunity = resolve_opportunity_semantic_fixture(_fixture([slot], [policy], trace))[0]
     stub = {
         "r1": {
             "A": SupportDomainValue(4.0, 1.0),

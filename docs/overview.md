@@ -2,7 +2,7 @@
 
 This repo exists to turn fishing-sim numeric systems into **verifiable artifacts**.
 
-It now contains four explicitly separated verification tracks:
+It now contains five explicitly separated verification tracks:
 
 1. **Legacy environment-field track**
    - Configs (nested JSON) -> derived environment field (`x*y*z*fish`)
@@ -32,6 +32,17 @@ It now contains four explicitly separated verification tracks:
    - Calls Fallback-owned planning, Gate and Spawn-Commit lifecycle helpers rather than duplicating Fallback formulas/state transitions
    - Protects `RP-AUTH-034` step-hook vs batch replay transport-shape invariance
    - Implemented under `replay_reference/` with tests under `tests/replay_integration/`
+
+5. **Current Opportunity semantic reference track**
+   - Starts from already-semantic `Qualified Measure / Semantic Event / Channel Close` traces; it does not recognize raw gestures or physics callbacks
+   - Resolves `ProgressSlot | EventSlot` into ordered `LogicalOpportunity` trace items at their logical crossing/event times
+   - Keeps Formation measure, Evaluation measure, weighted support and zero-mass context distinct
+   - Supports Point/Event, Qualified Time and Qualified Traversal reference evaluation; Phase masks consume pinned semantic tags rather than fish preference
+   - Preserves multiple threshold crossings inside one accepted source chunk instead of collapsing them to the chunk endpoint
+   - Event occurrences dedupe by stable semantic event identity; callback count cannot create extra tickets
+   - Optional fixture-only support joins apply `Join Before Reduce` before feeding opportunity-scoped weights into the existing Candidate Weight `calculate_true_pool(...)`
+   - ScopeClip remains fail-closed until an admitted owner policy is implemented; the adapter does not invent a clipping rule
+   - Implemented under `opportunity_reference/` with Fixture-K tests under `tests/opportunity_semantic/`
 
 The current reference tracks are intentionally isolated from `compute/`: they must not inherit the legacy invariant that fish weights are normalized to 1 per voxel. Future production adapters should be differential-tested against these references rather than reusing production functions as their oracle.
 

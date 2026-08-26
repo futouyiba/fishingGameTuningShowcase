@@ -491,9 +491,7 @@ def _resolve_context_refs(
         if span.source_scope_id != draft.source_scope_id:
             continue
         context_start = (
-            span.start_time
-            if draft.source_event is not None
-            else draft.interval_start_time
+            span.start_time if draft.source_event is not None else draft.interval_start_time
         )
         start = max(span.start_time, context_start)
         end = min(span.end_time, draft.logical_time)

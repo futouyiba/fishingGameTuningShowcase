@@ -40,6 +40,26 @@ Coverage includes:
 
 The reference `RandomAddress = RngEpoch + Domain + LogicalEvent + DrawSlot` is a semantic address model. The fixture SHA-256 uniform resolver is not the Production RNG contract.
 
+### Current Opportunity semantic reference tests
+Tests under `tests/opportunity_semantic/` protect Fixture-K semantics from already-resolved Opportunity-facing source traces through Candidate-kernel handoff.
+
+Coverage includes:
+- **Logical-time crossing locality:** one accepted measure span that crosses multiple thresholds emits multiple ordered Opportunities at their individual crossing times; packet/chunk endpoint cannot collapse them into one occurrence;
+- **Continuous measure != Renewal:** `ProgressSlot.occurrence_mode` explicitly distinguishes `renewal` from `once_per_scope` rather than treating every continuous source as a periodic ticket clock;
+- **Formation/Evaluation separation:** Static renewal may form from Dwell while evaluating a Point; Retrieve may form from effective progress while evaluating Traversal support;
+- **Evaluation-measure identity:** Qualified Time and Qualified Traversal produce different `alpha` shares from the same logical history; runtime sample count is not a measure source;
+- **Stable event identity:** duplicate callbacks with the same semantic `event_id` produce one admitted EventSlot occurrence; callback count cannot create extra tickets;
+- **Weighted support vs context:** Event Point can carry bounded antecedent context, but context refs have zero measure mass and do not alter `alpha`;
+- **No Future-Duration Leakage:** a OncePerScope pause ticket at `t*` is unchanged when only the future continuation of the same pause is lengthened;
+- **Technique != measure owner:** one technique can emit sequential Point and Time slots; slot order follows FormationPolicy order when logical times tie;
+- **Channel close:** source mass after Active Channel close cannot create later Opportunities;
+- **Join Before Reduce:** fixture-only `L_{i,j} * C_{i,j}` is joined on each positive support before `alpha` reduction, preventing phantom mass from `avg(L) * avg(C)`;
+- **Coverage fail-closed:** every positive support must expose the same materialized Species set in the fixture stub; mismatched coverage raises instead of silently dropping or zero-filling a Species;
+- **Kernel handoff:** resolved opportunity-scoped weights feed the existing Candidate Weight `calculate_true_pool(...)`; the Opportunity adapter does not duplicate TrueRoll math;
+- **ScopeClip boundary:** non-null `scope_clip_policy_ref` is fail-closed in Adapter V1 until an admitted owner policy exists; tests must not invent a result-dependent clip.
+
+Fixture-K `MeasureSpan` uses linear interpolation inside an already-semantic accepted span only as a deterministic fixture encoding for locating known crossings. It is not a Production sampling, packetization, or raw-presentation recognition contract.
+
 ## CI gate
 `./verify.sh` is the repository gate and uses non-mutating `ruff format --check`, Ruff lint, and pytest.
 

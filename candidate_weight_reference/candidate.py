@@ -1,26 +1,32 @@
-"""Admitted multiplicative Candidate weight specialization.
+"""Resolved-Scalar Native Retention projection.
 
-The canonical Candidate contract (Candidate Resolver / Assembly Current)
-composes Owner-resolved support outputs as
+Candidate Current (v5) closes the arbitrary Candidate-level Combine:
+the Canonical Candidate Native Join is the TypedNativeRetentionJoin
 
-    q_i,j = Combine(L_i,j, C_i,j)
+    Spatial Native Supply Measure dM_i(s,t)
+    x Interaction CaptureRetention C_i(s,p,t)
+    -> retained Native Candidate measure dQ_i = C_i * dM_i
+    -> Opportunity Reduce -> W_i^opp
+
+For already-resolved, aligned, scalarized support representation its
+canonical numeric branch is
+
+    q_i,j = L_i,j x C_i,j
     W_i^opp = sum_j alpha_j * q_i,j
 
-with support-wise Join before Reduce. The concrete ``Combine(L, C)``
-operator remains upstream authority and is deliberately Open; it is not
-frozen to multiplication, and this module does not define it.
+This module implements only that resolved-scalar numeric projection.
+It does not implement or claim the full typed Candidate resolution
+transaction: terminal TypedZero semantics, Unknown / Unsupported
+handling, input-necessity authority, the ``0 x Unknown`` prohibition,
+``CandidateResolutionResult`` / ``NativeCandidateSnapshot``
+completeness, and the relational Candidate Source Envelope all stay
+outside this scalar helper with their own Owners.
 
-This module implements the currently admitted Production / Reference
-Harness specialization ``Combine_prod(L, C) = L x C``. Its complete
-numeric input surface is exactly the two Owner-resolved fields below:
-the intensity arrives already resolved by the Spatial Owner (compiled
-Ambient stages plus the dynamic local snapshot) and the retention
-arrives already resolved by the Interaction Owner as the
-CaptureResponsePacket runtime surface. Upstream semantics have no
-numeric hook here: this module must not re-read, re-derive, or
-re-settle any upstream Cause, and this specialization is an
-implementation fact of the Runtime projection — it must not be read
-back as canonical Candidate semantics.
+The intensity arrives already resolved by the Spatial Owner (compiled
+Ambient stages plus the dynamic local snapshot); the retention arrives
+already resolved by the Interaction Owner as the CaptureResponsePacket
+runtime surface. Upstream semantics have no numeric hook here: this
+module must not re-read, re-derive, or re-settle any upstream Cause.
 """
 
 from __future__ import annotations
@@ -34,13 +40,12 @@ from .contracts import CaptureRuntimeSurface, LocalSpeciesIntensitySurface
 
 @dataclass(frozen=True)
 class CandidateWeightInputs:
-    """Numeric inputs to the admitted multiplicative specialization.
+    """Resolved-scalar inputs to the TypedNativeRetentionJoin numeric branch.
 
-    This is the complete numeric consumer surface for
-    ``Combine_prod(L, C) = L x C`` only. It is not the canonical
-    Candidate semantic surface, and it cannot express readiness,
-    aggregation, global availability, hard gates or any other upstream
-    factor as a multiplier.
+    Exactly two arithmetic fields; readiness, aggregation, global
+    availability, hard gates and any other upstream factor cannot be
+    expressed here. Typed zero / Unknown / input necessity / snapshot
+    completeness are outside this scalar surface.
     """
 
     local_species_intensity: float
@@ -59,7 +64,7 @@ def build_candidate_inputs(
     spatial: LocalSpeciesIntensitySurface,
     capture: CaptureRuntimeSurface,
 ) -> CandidateWeightInputs:
-    """Assemble the multiplicative specialization input from the two Owner surfaces."""
+    """Assemble the resolved-scalar Join input from the two Owner surfaces."""
     return CandidateWeightInputs(
         local_species_intensity=spatial.local_species_intensity,
         capture_retention=capture.capture_retention,
@@ -67,11 +72,12 @@ def build_candidate_inputs(
 
 
 def calculate_multiplicative_candidate_weight(inputs: CandidateWeightInputs) -> float:
-    """Admitted Production specialization ``Combine_prod(L, C) = L x C``.
+    """Resolved-scalar numeric branch of canonical TypedNativeRetentionJoin.
 
-    The canonical ``Combine(L, C)`` operator stays upstream authority
-    (Open); this function verifies the multiplicative Runtime
-    projection only and carries no Candidate semantic authority.
+    Implements ``q = L x C`` for inputs already resolved numeric.
+    Numeric zero alone does not establish terminality: typed zero /
+    Unknown / input necessity / snapshot completeness are outside this
+    scalar helper and stay with their Owners.
     """
     return inputs.local_species_intensity * inputs.capture_retention
 
@@ -81,9 +87,9 @@ def resolve_multiplicative_candidate_weights(
 ) -> dict[str, float]:
     """Materialize the per-species W vector for the shared TrueRoll kernel.
 
-    The W vector is produced under the admitted multiplicative
-    specialization only; it is the Runtime projection consumed by the
-    fixed-pan kernel, not the canonical Candidate semantic surface.
+    Resolved-Scalar Native Retention projection only; the typed
+    Candidate resolution transaction (``CandidateResolutionResult`` /
+    ``NativeCandidateSnapshot``) is not implemented here.
     """
     return {
         species_id: calculate_multiplicative_candidate_weight(inputs)

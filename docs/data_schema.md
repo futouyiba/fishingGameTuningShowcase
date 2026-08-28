@@ -24,10 +24,10 @@ Fields per pond:
 These Python dataclasses/functions are verification contracts, not production wire schemas.
 
 ### Candidate Weight reference
-- Admitted multiplicative Candidate specialization: `CandidateWeightInputs(local_species_intensity, capture_retention)` with `Combine_prod(L, C) = localSpeciesIntensity × captureRetention` (`calculate_multiplicative_candidate_weight` / `resolve_multiplicative_candidate_weights`); the canonical `Combine(L,C)` operator stays upstream authority (Open) and this specialization is not canonical Candidate semantics, and its consumer interface accepts no other multiplier
-- Spatial output surface: `localSpeciesIntensity` (required) plus optional `bakedSemanticStages / aggregationContextRef` provenance metadata that never enters arithmetic
+- Resolved-Scalar Native Retention projection (Candidate Current v5: Canonical Native Join = TypedNativeRetentionJoin, `dQ = C · dM`; resolved-scalar branch `q = L × C`): `CandidateWeightInputs(local_species_intensity, capture_retention)` with `localSpeciesIntensity × captureRetention` (`calculate_multiplicative_candidate_weight` / `resolve_multiplicative_candidate_weights`); PR scope is this numeric branch only — typed closure / `CandidateResolutionResult` / `NativeCandidateSnapshot` / relational Source Envelope are not implemented here, and the consumer interface accepts no other multiplier
+- Spatial output surface: `localSpeciesIntensity` (required) — the admitted resolved scalar of the Native Species Supply Measure M (density / intensity or equivalent integrated local-mass representation; not fish count, not probability) — plus optional `bakedSemanticStages / aggregationContextRef` provenance metadata that never enters arithmetic
 - Readiness public surface: `activeBehavioralStates`, `motivationProfile`, `enabledResponseModes`; `globalAvailability` is not a required field and cannot re-enter the surface
-- Capture runtime surface: `hasEligibleResponseMode`, `captureRetention`; the flag is typed metadata and a positive retention without an eligible mode fails closed (`CAPTURE_PACKET_INCONSISTENT`)
+- Capture runtime surface: `hasEligibleResponseMode`, `captureRetention ∈ [0,1]` — conditional retention on already-present Native Supply, not Bernoulli bite probability and not Supply amplification; the flag is typed metadata and a positive retention without an eligible mode fails closed (`CAPTURE_PACKET_INCONSISTENT`)
 - `derive_has_eligible_response_mode(modeResponses[])`: `any(modeEligible[m])`
 - legacy `hardValid / captureEligible` does not satisfy the Current canonical reader
 - `calculate_true_pool(...)`: fixed-pan total weight, saturation, `spawn_probability_per_opportunity`, and Species `probability_per_opportunity`

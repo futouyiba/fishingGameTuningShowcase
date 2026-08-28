@@ -1,10 +1,10 @@
 """TrueRoll kernel blockers rebuilt from Fixture Catalog A/B pinned goldens.
 
-Weights flow through the admitted multiplicative Candidate
-specialization (``Combine_prod(L, C) = localSpeciesIntensity x
-captureRetention``; the canonical ``Combine`` operator stays upstream
-authority) before reaching the shared fixed-pan kernel, so every golden
-below is end-to-end for that specialization's numeric surface.
+Weights flow through the resolved-scalar branch of canonical
+TypedNativeRetentionJoin (Candidate Current v5: ``q =
+localSpeciesIntensity x captureRetention`` for already-resolved inputs)
+before reaching the shared fixed-pan kernel, so every golden below is
+end-to-end for that numeric projection.
 """
 
 from __future__ import annotations

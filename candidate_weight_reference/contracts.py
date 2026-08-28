@@ -27,8 +27,12 @@ class ResolvedBehavioralContextSurface:
 class CaptureRuntimeSurface:
     """Current runtime-required fields from CaptureResponsePacket.
 
-    `has_eligible_response_mode` is typed zero / policy-guard / Explain
-    metadata only; it is not a multiplier and must not re-enter arithmetic.
+    ``capture_retention`` in [0, 1] is the Interaction-resolved
+    conditional retention on already-present Native Supply — not a
+    Bernoulli bite probability and not Supply amplification.
+    ``has_eligible_response_mode`` is typed zero / policy-guard /
+    Explain metadata only; it is not a multiplier and must not re-enter
+    arithmetic.
     """
 
     capture_retention: float
@@ -37,11 +41,17 @@ class CaptureRuntimeSurface:
 
 @dataclass(frozen=True)
 class LocalSpeciesIntensitySurface:
-    """Spatial Owner output consumed by the Candidate numeric surface.
+    """Spatial Owner output consumed by the resolved-scalar Candidate branch.
 
-    `local_species_intensity` is already resolved from Ambient B/P/E stages
-    plus the dynamic aggregation snapshot by the Spatial Owner. The optional
-    fields are Explain/provenance metadata and never participate in arithmetic.
+    Canonical Spatial semantic is the Native Species Supply Measure M.
+    ``local_species_intensity`` is the admitted resolved scalar
+    density / intensity (or equivalent integrated local-mass
+    representation) consumed by this Reference projection; it is not a
+    physical fish count, not a physical density and not a probability.
+    It arrives already resolved from Ambient B/P/E stages plus the
+    dynamic aggregation snapshot by the Spatial Owner. The optional
+    fields are Explain/provenance metadata and never participate in
+    arithmetic.
     """
 
     local_species_intensity: float

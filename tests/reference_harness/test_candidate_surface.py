@@ -1,13 +1,14 @@
 """Current Candidate surface blockers (CR-01 / CR-02) and structural negatives.
 
-These tests protect the shrunk consumer surface of the admitted
-multiplicative specialization ``Combine_prod(L, C) = L x C``: its
-numeric arithmetic consumes exactly the two Owner-resolved inputs, and
-legacy factors (readiness, aggregation, global availability, hard gates,
-environment/adaptation/access/technique multipliers) cannot re-enter the
-consumer even when they still ride along in packets as Explain metadata.
-The canonical ``Combine(L, C)`` operator stays upstream authority (Open);
-nothing here freezes multiplication as Candidate semantics.
+These tests protect the resolved-scalar numeric branch of canonical
+TypedNativeRetentionJoin (Candidate Current v5: ``q = L x C`` for
+already-resolved inputs): its arithmetic consumes exactly the two
+Owner-resolved inputs, and legacy factors (readiness, aggregation,
+global availability, hard gates, environment/adaptation/access/
+technique multipliers) cannot re-enter the consumer even when they
+still ride along in packets as Explain metadata. The typed Candidate
+resolution transaction (typed-zero terminality / Unknown / completeness
+/ CandidateResolutionResult) is outside this scalar surface.
 """
 
 from __future__ import annotations
@@ -306,3 +307,46 @@ def test_local_intensity_surface_is_typed_metadata_not_arithmetic() -> None:
         "baked_semantic_stages",
         "aggregation_context_ref",
     ]
+
+
+# Candidate Current v5 closed the arbitrary Candidate-level Combine:
+# the Canonical Native Join is TypedNativeRetentionJoin and the
+# resolved-scalar branch is q = L x C. Stale v3 authority wording must
+# not regrow, and the harness must not overclaim the typed transaction.
+STALE_V3_AUTHORITY_WORDING = (
+    "remains open",
+    "remains upstream authority",
+    "stays upstream authority",
+    "admitted specialization",
+    "admitted multiplicative",
+    "combine_prod",
+    "not canonical candidate semantics",
+    "not frozen to multiplication",
+    "not frozen here",
+)
+OVERCLAIM_V5_WORDING = (
+    "full candidate v5 implemented",
+    "full typed candidate resolution implemented",
+    "nativecandidatesnapshot implemented",
+    "typed resolution complete",
+    "source envelope implemented",
+)
+WORDING_SCOPE_PATHS = (
+    REFERENCE_PACKAGE / "candidate.py",
+    REFERENCE_PACKAGE / "contracts.py",
+    REFERENCE_PACKAGE / "ambient.py",
+    REFERENCE_PACKAGE.parent / "opportunity_reference" / "adapter.py",
+    REFERENCE_PACKAGE.parent / "docs" / "overview.md",
+    REFERENCE_PACKAGE.parent / "docs" / "data_schema.md",
+)
+
+
+@pytest.mark.parametrize("path", WORDING_SCOPE_PATHS, ids=lambda path: path.name)
+def test_candidate_wording_matches_current_v5_scope(path: Path) -> None:
+    text = path.read_text().lower()
+
+    stale = [phrase for phrase in STALE_V3_AUTHORITY_WORDING if phrase in text]
+    assert not stale, f"{path.name} carries stale v3 authority wording: {stale}"
+
+    overclaim = [phrase for phrase in OVERCLAIM_V5_WORDING if phrase in text]
+    assert not overclaim, f"{path.name} overclaims Candidate v5 scope: {overclaim}"

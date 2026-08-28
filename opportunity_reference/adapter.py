@@ -519,10 +519,11 @@ def resolve_opportunity_candidate_weights(
 ) -> ResolvedOpportunityWeights:
     """Fixture-only Join-Before-Reduce bridge into the existing TruePool kernel.
 
-    Per-support ``q_i,j`` uses the admitted multiplicative
-    specialization ``Combine_prod(L, C) = L x C``; the canonical
-    ``Combine(L, C)`` operator stays upstream authority and is not
-    frozen here.
+    Per-support ``q_i,j`` uses the resolved-scalar branch of canonical
+    TypedNativeRetentionJoin (``q = L x C`` for already-resolved numeric
+    inputs). The relational Candidate Source Envelope and
+    source-presentation relation support are Current semantic capability
+    but are out of scope for this adapter.
     """
 
     positive_support = [support for support in trace_item.weighted_support if support.alpha > 0]

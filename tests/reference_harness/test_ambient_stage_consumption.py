@@ -16,7 +16,7 @@ def test_fully_baked_carrier_feeds_current_candidate_surface_only() -> None:
 
     The retired chain continued with independent G/V multipliers
     (72 * 1.10 * 0.80 * 0.50 = 31.68, now a pinned legacy fixture); the
-    admitted multiplicative specialization surface has no hook for them.
+    resolved-scalar TypedNativeRetentionJoin branch has no hook for them.
     """
     carrier = CompiledAmbientCarrier(value=72.0, baked_semantic_stages=frozenset({"B", "P", "E"}))
     ambient = resolve_ambient_carrier(carrier, {})

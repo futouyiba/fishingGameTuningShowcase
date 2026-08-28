@@ -61,6 +61,26 @@ Coverage includes:
 
 Fixture-K `MeasureSpan` uses linear interpolation inside an already-semantic accepted span only as a deterministic fixture encoding for locating known crossings. It is not a Production sampling, packetization, or raw-presentation recognition contract.
 
+### PersistentCauseState Admission reference tests
+Tests under `tests/persistent_cause/` protect admission and minimum lifecycle conformance without implementing a universal history store or any concrete Production Cause reducer.
+
+Release-blocking coverage includes:
+- **PC-01 / PC-02 — History necessity:** absent same-present/different-admissible-history/different-future proof rejects as `REJECT_DERIVED_OR_CACHE`; a complete divergence fixture allows the remaining gates to proceed;
+- **PC-03 — Exactly-one owner:** missing, empty or multiple candidate owners return `OWNER_UNRESOLVED`;
+- **PC-04 / PC-05 — Formation authority and bearer boundary:** client/UI/callback-only mutation sources cannot authorize state, and missing bearer or scope blocks admission;
+- **PC-06 — Cause != Effect:** anonymous `stressCoeff`, `catchabilityPenalty` or equivalent derived responses are not admitted without an underlying authoritative Cause identity;
+- **PC-07 — Minimum lifecycle:** formation/update, reducer, logical time, decay/recovery, explicit merge/stack applicability, reset/expiration, version invalidation, replay, cardinality and consumer declarations must be complete;
+- **PC-08 — Cardinality discipline:** an explicitly high-cardinality bearer class requires lower-cardinality consideration plus a rejection reason;
+- **PC-09 — Replay equivalence:** the same ordered semantic events and reducer version produce one canonical semantic digest regardless of transport chunking; the fixture does not implement Production replay mechanics;
+- **PC-10 — Temporal conformance:** resolve -> event -> mutate -> result-affecting re-resolve inside one logical epoch is blocked as `TEMPORAL_CYCLE_VIOLATION`;
+- **PC-11 — Cause independence:** distinct Cause IDs, concrete owners and lifecycles may coexist and are never merged into a universal `HistoricalState`;
+- **PC-12 — Existing state is not admission:** `FallbackSafetyState` is used as a negative fixture proving that implemented/replayable state without G1-G7 declarations remains Not Admitted.
+
+A green gate supports only this boundary:
+- `PersistentCauseState Admission Reference = CI_VERIFIED`;
+- `Concrete Production Persistent Cause Families = UNVERIFIED / per-Owner status`;
+- `Production Runtime Store / Replay Integration = separately verified or BLOCKED_REPO_ACCESS`.
+
 ## CI gate
 `./verify.sh` is the repository gate and uses non-mutating `ruff format --check`, Ruff lint, and pytest.
 

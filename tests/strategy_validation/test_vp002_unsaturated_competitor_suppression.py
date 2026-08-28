@@ -127,10 +127,7 @@ def test_vp002_positive_control_matches_current_unsaturated_invariant() -> None:
     assert counterfactual.species["A"].probability_per_opportunity == 0.1
     assert baseline.species["A"].roll_time_seconds == 10.0
     assert counterfactual.species["A"].roll_time_seconds == 10.0
-    assert (
-        counterfactual.species["A"].conditional_purity
-        > baseline.species["A"].conditional_purity
-    )
+    assert counterfactual.species["A"].conditional_purity > baseline.species["A"].conditional_purity
     assert (
         counterfactual.spawn_probability_per_opportunity
         < baseline.spawn_probability_per_opportunity
@@ -143,10 +140,7 @@ def test_vp002_hidden_target_boost_negative_control_fails_even_if_purity_improve
     verdict = _validate_pair(BASELINE_WEIGHTS, HIDDEN_TARGET_BOOST_WEIGHTS)
 
     # The bad implementation can still make the player-facing purity KPI look better.
-    assert (
-        injected.species["A"].conditional_purity
-        > baseline.species["A"].conditional_purity
-    )
+    assert injected.species["A"].conditional_purity > baseline.species["A"].conditional_purity
 
     # But it illegally changes the target Native mass and absolute roll rate.
     assert verdict.execution_status is ValidationExecutionStatus.EXECUTED
@@ -154,10 +148,7 @@ def test_vp002_hidden_target_boost_negative_control_fails_even_if_purity_improve
     assert verdict.outcome_pass is False
     assert verdict.overall_pass is False
     assert "VP002.TARGET_NATIVE_WEIGHT_UNCHANGED" in verdict.violated_invariants
-    assert (
-        "VP002.TARGET_ABSOLUTE_PER_OPPORTUNITY_UNCHANGED"
-        in verdict.violated_invariants
-    )
+    assert "VP002.TARGET_ABSOLUTE_PER_OPPORTUNITY_UNCHANGED" in verdict.violated_invariants
     assert "BASIS_LEAK" in verdict.failure_class
 
 

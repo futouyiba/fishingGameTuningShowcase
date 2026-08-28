@@ -16,6 +16,7 @@ It now contains five explicitly separated verification tracks:
    - Current Capture runtime surface: `hasEligibleResponseMode + captureRetention`; the flag is typed zero / policy-guard metadata (a positive retention without an eligible mode fails closed as `CAPTURE_PACKET_INCONSISTENT`), not a consumer-side gate multiplier; legacy `hardValid/captureEligible` is not a canonical required field
    - Mode-local eligibility derivation protects sibling isolation: one ineligible Mode does not invalidate another eligible Mode
    - Compiled ambient `B/P/E` stage-consumption guards
+   - Strong Bake Manifest envelope on the compiled ambient carrier: three separated layers — revision-free `SemanticConsequenceIdentity`, `MaterializedConsequence` instances with explicit validity (`valid | invalid | unknown`), and `MaterializationLineage` provenance; duplicate settlement by identity (`DUPLICATE_SEMANTIC_CONSEQUENCE`), replacement-not-stacking invalidation, missing manifest / incomplete lineage / unknown validity / summary-mismatch fail-closed guards; `baked_semantic_stages` stays a compatibility summary cross-checked against manifest coverage and the manifest never recomputes ambient or Candidate arithmetic
    - The retired `×G×V×C` factorized chain exists only in `candidate_weight_reference/legacy.py` behind explicitly marked pinned legacy fixtures that materialize a final W for the shared kernel
    - Implemented under `candidate_weight_reference/` with tests under `tests/reference_harness/`
 

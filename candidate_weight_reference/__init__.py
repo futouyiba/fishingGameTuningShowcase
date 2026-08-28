@@ -2,8 +2,8 @@ from .ambient import CompiledAmbientCarrier, resolve_ambient_carrier
 from .candidate import (
     CandidateWeightInputs,
     build_candidate_inputs,
-    calculate_candidate_weight,
-    resolve_candidate_weights,
+    calculate_multiplicative_candidate_weight,
+    resolve_multiplicative_candidate_weights,
 )
 from .contracts import (
     CaptureRuntimeSurface,
@@ -27,12 +27,12 @@ __all__ = [
     "SpeciesRollResult",
     "TruePoolResult",
     "build_candidate_inputs",
-    "calculate_candidate_weight",
+    "calculate_multiplicative_candidate_weight",
     "calculate_true_pool",
     "derive_has_eligible_response_mode",
     "read_capture_runtime_surface",
     "read_local_species_intensity_surface",
     "read_readiness_public_surface",
     "resolve_ambient_carrier",
-    "resolve_candidate_weights",
+    "resolve_multiplicative_candidate_weights",
 ]

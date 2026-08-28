@@ -11,7 +11,7 @@ It now contains five explicitly separated verification tracks:
 
 2. **Current Candidate Weight reference track**
    - Pure deterministic fixed-pan reference kernel
-   - Current Candidate numeric surface is exactly `W = localSpeciesIntensity × captureRetention` via `CandidateWeightInputs`; readiness, aggregation, global availability and other upstream semantics have no numeric hook on the consumer interface
+   - Canonical Candidate composition (`q_i,j = Combine(L_i,j, C_i,j)` → support-wise Join → Reduce) is owned by the Candidate Resolver / Assembly Current and the concrete `Combine` operator stays Open; this track implements and verifies the admitted Production specialization `Combine_prod(L, C) = localSpeciesIntensity × captureRetention` via `CandidateWeightInputs`, whose numeric consumer surface still admits no readiness / aggregation / global-availability multiplier
    - Readiness public surface no longer requires `globalAvailability`; Interaction consumes states / motivation / enabled modes and projects behavioral effects into the resolved `captureRetention`
    - Current Capture runtime surface: `hasEligibleResponseMode + captureRetention`; the flag is typed zero / policy-guard metadata (a positive retention without an eligible mode fails closed as `CAPTURE_PACKET_INCONSISTENT`), not a consumer-side gate multiplier; legacy `hardValid/captureEligible` is not a canonical required field
    - Mode-local eligibility derivation protects sibling isolation: one ineligible Mode does not invalidate another eligible Mode

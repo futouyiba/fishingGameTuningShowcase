@@ -6,7 +6,7 @@ from candidate_weight_reference import (
     CandidateWeightInputs,
     CompiledAmbientCarrier,
     ContractViolation,
-    calculate_candidate_weight,
+    calculate_multiplicative_candidate_weight,
     resolve_ambient_carrier,
 )
 
@@ -16,12 +16,12 @@ def test_fully_baked_carrier_feeds_current_candidate_surface_only() -> None:
 
     The retired chain continued with independent G/V multipliers
     (72 * 1.10 * 0.80 * 0.50 = 31.68, now a pinned legacy fixture); the
-    Current Candidate surface has no hook for them.
+    admitted multiplicative specialization surface has no hook for them.
     """
     carrier = CompiledAmbientCarrier(value=72.0, baked_semantic_stages=frozenset({"B", "P", "E"}))
     ambient = resolve_ambient_carrier(carrier, {})
 
-    weight = calculate_candidate_weight(
+    weight = calculate_multiplicative_candidate_weight(
         CandidateWeightInputs(local_species_intensity=ambient, capture_retention=0.50)
     )
     assert ambient == pytest.approx(72.0)

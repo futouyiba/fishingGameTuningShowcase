@@ -1,10 +1,13 @@
 """Current Candidate surface blockers (CR-01 / CR-02) and structural negatives.
 
-These tests protect the shrunk Consumer contract: the Candidate numeric
-arithmetic is exactly ``W = localSpeciesIntensity x captureRetention`` and
+These tests protect the shrunk consumer surface of the admitted
+multiplicative specialization ``Combine_prod(L, C) = L x C``: its
+numeric arithmetic consumes exactly the two Owner-resolved inputs, and
 legacy factors (readiness, aggregation, global availability, hard gates,
 environment/adaptation/access/technique multipliers) cannot re-enter the
 consumer even when they still ride along in packets as Explain metadata.
+The canonical ``Combine(L, C)`` operator stays upstream authority (Open);
+nothing here freezes multiplication as Candidate semantics.
 """
 
 from __future__ import annotations
@@ -21,11 +24,11 @@ from candidate_weight_reference import (
     LocalSpeciesIntensitySurface,
     ResolvedBehavioralContextSurface,
     build_candidate_inputs,
-    calculate_candidate_weight,
+    calculate_multiplicative_candidate_weight,
     read_capture_runtime_surface,
     read_local_species_intensity_surface,
     read_readiness_public_surface,
-    resolve_candidate_weights,
+    resolve_multiplicative_candidate_weights,
 )
 
 REFERENCE_PACKAGE = Path(__file__).resolve().parents[2] / "candidate_weight_reference"
@@ -93,7 +96,7 @@ NUMERIC_PATH_MODULES = ("candidate.py", "kernel.py")
 
 
 def test_cr01_current_candidate_weight_is_exactly_local_times_capture() -> None:
-    weight = calculate_candidate_weight(
+    weight = calculate_multiplicative_candidate_weight(
         CandidateWeightInputs(local_species_intensity=100.0, capture_retention=0.4)
     )
     assert weight == 40.0
@@ -157,7 +160,7 @@ def test_cr02_forbidden_legacy_packet_metadata_cannot_change_candidate_weight() 
     spatial = read_local_species_intensity_surface(spatial_packet)
     capture = read_capture_runtime_surface(capture_packet)
     read_readiness_public_surface(readiness_packet)
-    weight = calculate_candidate_weight(build_candidate_inputs(spatial, capture))
+    weight = calculate_multiplicative_candidate_weight(build_candidate_inputs(spatial, capture))
 
     assert weight == 40.0
 
@@ -281,9 +284,9 @@ def test_fixture_i_owner_packets_flow_into_current_candidate_surface() -> None:
     )
 
     inputs = build_candidate_inputs(spatial, capture)
-    weights = resolve_candidate_weights({"A": inputs})
+    weights = resolve_multiplicative_candidate_weights({"A": inputs})
 
-    assert calculate_candidate_weight(inputs) == 40.0
+    assert calculate_multiplicative_candidate_weight(inputs) == 40.0
     assert weights == {"A": 40.0}
     assert spatial.baked_semantic_stages == frozenset({"B", "P", "E"})
     assert spatial.aggregation_context_ref == "agg-snapshot#1"

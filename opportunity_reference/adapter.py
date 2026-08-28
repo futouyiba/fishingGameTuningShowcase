@@ -5,7 +5,10 @@ from dataclasses import dataclass, field
 from math import isclose, isfinite
 from typing import Literal
 
-from candidate_weight_reference import CandidateWeightInputs, calculate_candidate_weight
+from candidate_weight_reference import (
+    CandidateWeightInputs,
+    calculate_multiplicative_candidate_weight,
+)
 
 MeasureKind = Literal["point", "time", "traversal"]
 OccurrenceMode = Literal["renewal", "once_per_scope"]
@@ -514,7 +517,13 @@ def resolve_opportunity_candidate_weights(
     trace_item: OpportunityTraceItem,
     support_domain_stub: Mapping[str, Mapping[str, SupportDomainValue]],
 ) -> ResolvedOpportunityWeights:
-    """Fixture-only Join-Before-Reduce bridge into the existing TruePool kernel."""
+    """Fixture-only Join-Before-Reduce bridge into the existing TruePool kernel.
+
+    Per-support ``q_i,j`` uses the admitted multiplicative
+    specialization ``Combine_prod(L, C) = L x C``; the canonical
+    ``Combine(L, C)`` operator stays upstream authority and is not
+    frozen here.
+    """
 
     positive_support = [support for support in trace_item.weighted_support if support.alpha > 0]
     if not positive_support:
@@ -534,7 +543,7 @@ def resolve_opportunity_candidate_weights(
         weight = 0.0
         for support in positive_support:
             value = support_domain_stub[support.support_id][species_id]
-            weight += support.alpha * calculate_candidate_weight(
+            weight += support.alpha * calculate_multiplicative_candidate_weight(
                 CandidateWeightInputs(
                     local_species_intensity=value.local_species_intensity,
                     capture_retention=value.capture_retention,

@@ -1,9 +1,10 @@
 """TrueRoll kernel blockers rebuilt from Fixture Catalog A/B pinned goldens.
 
-Weights flow through the Current Candidate surface
-(``W = localSpeciesIntensity x captureRetention``) before reaching the
-shared fixed-pan kernel, so every golden below is end-to-end for the
-Current numeric surface.
+Weights flow through the admitted multiplicative Candidate
+specialization (``Combine_prod(L, C) = localSpeciesIntensity x
+captureRetention``; the canonical ``Combine`` operator stays upstream
+authority) before reaching the shared fixed-pan kernel, so every golden
+below is end-to-end for that specialization's numeric surface.
 """
 
 from __future__ import annotations
@@ -14,7 +15,7 @@ from candidate_weight_reference import (
     CandidateWeightInputs,
     TruePoolResult,
     calculate_true_pool,
-    resolve_candidate_weights,
+    resolve_multiplicative_candidate_weights,
 )
 
 
@@ -23,7 +24,7 @@ def _pool(
     pan_capacity: float,
     opportunity_rate_per_sec: float = 1.0,
 ) -> TruePoolResult:
-    weights = resolve_candidate_weights(
+    weights = resolve_multiplicative_candidate_weights(
         {
             species_id: CandidateWeightInputs(
                 local_species_intensity=intensity,
@@ -131,7 +132,7 @@ def test_cr03_cr04_contrast_suppression_is_not_supply_lift() -> None:
 
 def test_a4_runtime_integer_scale_of_weights_and_pan_capacity_is_invariant() -> None:
     before = _pool(FIXTURE_A_ROWS, pan_capacity=1000, opportunity_rate_per_sec=2)
-    baseline_weights = resolve_candidate_weights(
+    baseline_weights = resolve_multiplicative_candidate_weights(
         {
             species_id: CandidateWeightInputs(
                 local_species_intensity=intensity,

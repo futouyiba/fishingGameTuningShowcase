@@ -3,19 +3,37 @@ from __future__ import annotations
 import pytest
 
 from candidate_weight_reference import (
+    CandidateWeightInputs,
     CompiledAmbientCarrier,
     ContractViolation,
-    continue_candidate_chain,
+    calculate_candidate_weight,
     resolve_ambient_carrier,
 )
 
 
-def test_fully_baked_ambient_carrier_continues_only_g_v_c() -> None:
+def test_fully_baked_carrier_feeds_current_candidate_surface_only() -> None:
+    """A fully baked artifact is already Owner-resolved: downstream is L x C only.
+
+    The retired chain continued with independent G/V multipliers
+    (72 * 1.10 * 0.80 * 0.50 = 31.68, now a pinned legacy fixture); the
+    Current Candidate surface has no hook for them.
+    """
     carrier = CompiledAmbientCarrier(value=72.0, baked_semantic_stages=frozenset({"B", "P", "E"}))
     ambient = resolve_ambient_carrier(carrier, {})
-    final_weight = continue_candidate_chain(ambient, aggregation=1.10, readiness=0.80, capture=0.50)
 
-    assert final_weight == pytest.approx(31.68)
+    weight = calculate_candidate_weight(
+        CandidateWeightInputs(local_species_intensity=ambient, capture_retention=0.50)
+    )
+    assert ambient == pytest.approx(72.0)
+    assert weight == pytest.approx(36.0)
+
+    with pytest.raises(TypeError):
+        CandidateWeightInputs(
+            local_species_intensity=ambient,
+            capture_retention=0.50,
+            aggregation=1.10,
+            readiness=0.80,
+        )
 
 
 def test_duplicate_baked_stage_consumption_is_release_blocker() -> None:
@@ -42,3 +60,13 @@ def test_partial_bake_consumes_only_missing_population_stage() -> None:
     ambient = resolve_ambient_carrier(carrier, {"P": 0.5})
 
     assert ambient == pytest.approx(4.0)
+
+
+def test_missing_ambient_stage_fails_closed() -> None:
+    carrier = CompiledAmbientCarrier(value=8.0, baked_semantic_stages=frozenset({"E"}))
+
+    with pytest.raises(ContractViolation) as exc_info:
+        resolve_ambient_carrier(carrier, {})
+
+    assert exc_info.value.code == "PRODUCER_MISSING_REQUIRED_FIELD"
+    assert exc_info.value.detail == "ambient stage(s): B,P"

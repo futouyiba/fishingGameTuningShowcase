@@ -60,6 +60,25 @@ Coverage includes:
 
 Fixture-K `MeasureSpan` uses linear interpolation inside an already-semantic accepted span only as a deterministic fixture encoding for locating known crossings. It is not a Production sampling, packetization, or raw-presentation recognition contract.
 
+### Reference Numeric DOF identifiability tests
+Tests under `tests/validation_reference/test_numeric_dof_identifiability.py` protect the admission invariant `Semantic independence != independent tuning DOF`.
+
+Blocker coverage includes:
+- `ID-01`: an unconstrained requested FREE coefficient is rejected;
+- `ID-02`: distinct semantic owners alone do not buy distinct FREE numeric degrees of freedom;
+- `ID-03`: simultaneous FREE requests in one compensation-equivalence group are rejected without selecting an arbitrary winner;
+- `ID-04`: a traceable isolatable counterfactual or ablation admits FREE;
+- `ID-05`: an explicit tie admits or downgrades to TIED, not FREE;
+- `ID-06`: an explicit design policy admits FIXED and does not increase the FREE count;
+- `ID-07`: a sparse species residual requires a shared baseline, cross-context stability and independently constraining evidence;
+- `ID-08`: repeated same-direction species residuals require shared-model refactoring rather than additional species FREE degrees of freedom;
+- `ID-09`: KPI matching or compensation is not identifiability evidence;
+- `ID-10`: splitting a shared parameter into multiple FREE requests requires new independent evidence.
+
+The aggregate admission report keeps declared fields separate from independent numeric freedom through `requested_dof_count`, `admitted_free_dof_count`, `admitted_tied_count`, `admitted_fixed_count`, `admitted_derived_count`, `rejected_count`, `free_dof_by_scope`, `species_residual_free_count`, `compensation_group_conflicts`, and `refactor_required_groups`.
+
+The gate consumes explicit synthetic metadata and fixture references. It does not fit coefficients, infer semantic ownership, require the Production species roster, or implement a symbolic identifiability solver. Green Reference CI does not prove that Production calibration admission enforcement exists or is wired to this validator.
+
 ## CI gate
 `./verify.sh` is the repository gate and uses non-mutating `ruff format --check`, Ruff lint, and pytest.
 

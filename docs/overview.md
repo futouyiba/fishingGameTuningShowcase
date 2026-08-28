@@ -2,7 +2,7 @@
 
 This repo exists to turn fishing-sim numeric systems into **verifiable artifacts**.
 
-It now contains five explicitly separated verification tracks:
+It now contains six explicitly separated verification tracks:
 
 1. **Legacy environment-field track**
    - Configs (nested JSON) -> derived environment field (`x*y*z*fish`)
@@ -45,6 +45,14 @@ It now contains five explicitly separated verification tracks:
    - Optional fixture-only support joins apply `Join Before Reduce` before feeding opportunity-scoped weights into the existing Candidate Weight `calculate_true_pool(...)`
    - ScopeClip remains fail-closed until an admitted owner policy is implemented; the adapter does not invent a clipping rule
    - Implemented under `opportunity_reference/` with Fixture-K tests under `tests/opportunity_semantic/`
+
+6. **Reference Numeric DOF identifiability validation track**
+   - Evaluates explicit metadata for requested `FREE`, `TIED`, `FIXED`, or `DERIVED` numeric freedom and reports the independently admitted mode
+   - Admits a FREE degree of freedom only from a traceable independently constraining measurement, isolatable fixture, or isolatable counterfactual/ablation
+   - Rejects compensation-equivalent FREE requests, KPI-only claims, unsupported shared-parameter splits, and repeated species-residual hotspots; explicit ties and design constraints reduce rather than increase numeric freedom
+   - Reports declared request count separately from admitted FREE count, including scope, species-residual, compensation-conflict, and shared-model-refactor summaries
+   - This validator is neither a Parameter Semantic Owner nor an automatic calibrator or symbolic identifiability solver; it does not fit coefficients or alter Candidate, TrueRoll, Opportunity, Replay, or Current calibration arithmetic
+   - Implemented under `validation_reference/` with blocker tests under `tests/validation_reference/`
 
 The current reference tracks are intentionally isolated from `compute/`: they must not inherit the legacy invariant that fish weights are normalized to 1 per voxel. Future production adapters should be differential-tested against these references rather than reusing production functions as their oracle.
 

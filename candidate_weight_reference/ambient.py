@@ -52,13 +52,3 @@ def resolve_ambient_carrier(
             raise ValueError(f"ambient stage {stage} must be finite and >= 0")
         result *= value
     return result
-
-
-def continue_candidate_chain(
-    ambient_weight: float,
-    aggregation: float,
-    readiness: float,
-    capture: float,
-) -> float:
-    """Continue only the downstream G-to-V-to-C stages after ambient materialization."""
-    return ambient_weight * aggregation * readiness * capture

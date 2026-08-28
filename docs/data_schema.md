@@ -24,7 +24,7 @@ Fields per pond:
 These Python dataclasses/functions are verification contracts, not production wire schemas.
 
 ### Candidate Weight reference
-- Admitted multiplicative Candidate specialization: `CandidateWeightInputs(local_species_intensity, capture_retention)` with `Combine_prod(L, C) = L × captureRetention` (`calculate_multiplicative_candidate_weight` / `resolve_multiplicative_candidate_weights`); the canonical `Combine(L,C)` operator stays upstream authority (Open) and this specialization is not canonical Candidate semantics, and its consumer interface accepts no other multiplier
+- Admitted multiplicative Candidate specialization: `CandidateWeightInputs(local_species_intensity, capture_retention)` with `Combine_prod(L, C) = localSpeciesIntensity × captureRetention` (`calculate_multiplicative_candidate_weight` / `resolve_multiplicative_candidate_weights`); the canonical `Combine(L,C)` operator stays upstream authority (Open) and this specialization is not canonical Candidate semantics, and its consumer interface accepts no other multiplier
 - Spatial output surface: `localSpeciesIntensity` (required) plus optional `bakedSemanticStages / aggregationContextRef` provenance metadata that never enters arithmetic
 - Readiness public surface: `activeBehavioralStates`, `motivationProfile`, `enabledResponseModes`; `globalAvailability` is not a required field and cannot re-enter the surface
 - Capture runtime surface: `hasEligibleResponseMode`, `captureRetention`; the flag is typed metadata and a positive retention without an eligible mode fails closed (`CAPTURE_PACKET_INCONSISTENT`)

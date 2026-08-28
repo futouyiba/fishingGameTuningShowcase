@@ -2,7 +2,7 @@
 
 This repo exists to turn fishing-sim numeric systems into **verifiable artifacts**.
 
-It now contains five explicitly separated verification tracks:
+It now contains six explicitly separated verification tracks:
 
 1. **Legacy environment-field track**
    - Configs (nested JSON) -> derived environment field (`x*y*z*fish`)
@@ -46,6 +46,15 @@ It now contains five explicitly separated verification tracks:
    - Optional fixture-only support joins apply `Join Before Reduce` before feeding opportunity-scoped weights into the existing Candidate Weight `calculate_true_pool(...)`
    - ScopeClip remains fail-closed until an admitted owner policy is implemented; the adapter does not invent a clipping rule
    - Implemented under `opportunity_reference/` with Fixture-K tests under `tests/opportunity_semantic/`
+
+6. **PersistentCauseState Admission reference track**
+   - Validates proposed persistent Causes against explicit G1-G7 declarations: history necessity, authoritative formation/update, bearer/identity/scope, independent lifecycle, independent consumer value, authority/replayability and cardinality discipline
+   - Requires exactly one concrete Cause owner, an underlying Cause rather than an anonymous derived response, and no same-epoch resolve/writeback cycle
+   - Returns a structured admission status plus failed gates and reason codes; replayable state existence or a boolean `is_persistent` marker is never admission evidence
+   - Includes a fixture-only deterministic reconstruction digest to check logical event/version equivalence independently of transport chunking; it does not copy the Server ReplayLease contract or implement a Production store
+   - Keeps distinct admitted Cause IDs and owners independent instead of inventing a universal `HistoricalState` owner
+   - Does not choose the bearer, reducer, decay, consumer or lifecycle semantics for Satiation, Disturbance, Learning, Aggregation or any other concrete Production Cause family
+   - Implemented under `persistent_cause_reference/` with PC-01...PC-12 tests under `tests/persistent_cause/`
 
 The current reference tracks are intentionally isolated from `compute/`: they must not inherit the legacy invariant that fish weights are normalized to 1 per voxel. Future production adapters should be differential-tested against these references rather than reusing production functions as their oracle.
 

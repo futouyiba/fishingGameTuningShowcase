@@ -149,6 +149,17 @@ class StrongBakeManifest:
                         "BAKE_LINEAGE_INCOMPLETE",
                         f"{consequence.identity.canonical_label()}: lineage {field_name} is missing",
                     )
+        instance_identities: dict[str, SemanticConsequenceIdentity] = {}
+        for consequence in self.materialized:
+            prior_identity = instance_identities.get(consequence.instance_id)
+            if prior_identity is not None:
+                raise ContractViolation(
+                    "DUPLICATE_MATERIALIZATION_INSTANCE_ID",
+                    f"{consequence.instance_id}: already addresses "
+                    f"{prior_identity.canonical_label()} and cannot also address "
+                    f"{consequence.identity.canonical_label()}",
+                )
+            instance_identities[consequence.instance_id] = consequence.identity
         active: dict[SemanticConsequenceIdentity, str] = {}
         for consequence in self.materialized:
             if consequence.validity != VALIDITY_VALID:

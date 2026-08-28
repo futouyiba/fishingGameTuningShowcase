@@ -198,6 +198,89 @@ def test_sb04_same_raw_fact_different_cause_roles_are_distinct() -> None:
     assert labels == {"Spatial.ThermalSuitability@scope-X", "Functional.AerobicConsequence@scope-X"}
 
 
+def test_materialization_instance_id_is_globally_unique_across_history() -> None:
+    """An instance ID addresses exactly one immutable history record."""
+    thermal = make_consequence(
+        identity=make_identity(
+            cause_role="Temperature",
+            consequence_kind="ThermalSuitability",
+            ownership_boundary="Spatial",
+        ),
+        instance_id="inst-shared",
+        settled_stage="B",
+        validity="invalid",
+    )
+    aerobic = make_consequence(
+        identity=make_identity(
+            cause_role="Temperature",
+            consequence_kind="AerobicConsequence",
+            ownership_boundary="Functional",
+        ),
+        instance_id="inst-shared",
+        settled_stage="P",
+    )
+
+    with pytest.raises(ContractViolation) as exc_info:
+        StrongBakeManifest(
+            materialized=(thermal, aerobic),
+            baked_semantic_stages=frozenset({"P"}),
+        )
+
+    assert exc_info.value.code == "DUPLICATE_MATERIALIZATION_INSTANCE_ID"
+
+
+def test_settlement_rejects_reusing_invalid_history_instance_id() -> None:
+    """Invalid history retains its ID; later records cannot reuse it."""
+    old = make_consequence(instance_id="inst-retained", validity="invalid")
+    manifest = StrongBakeManifest(materialized=(old,), baked_semantic_stages=frozenset())
+    replacement = make_consequence(
+        identity=make_identity(
+            cause_role="Aggregation",
+            consequence_kind="LocalPopulation",
+        ),
+        instance_id="inst-retained",
+        settled_stage="P",
+    )
+
+    with pytest.raises(ContractViolation) as exc_info:
+        settle_materialized_consequence(manifest, replacement)
+
+    assert exc_info.value.code == "DUPLICATE_MATERIALIZATION_INSTANCE_ID"
+
+
+def test_invalidation_targets_exactly_one_materialization_and_stage() -> None:
+    """A globally unique ID removes only its addressed record from coverage."""
+    stage_b = make_consequence(
+        identity=make_identity(
+            cause_role="SeasonalBase",
+            consequence_kind="BaselinePopulation",
+        ),
+        instance_id="inst-b",
+        settled_stage="B",
+    )
+    stage_p = make_consequence(
+        identity=make_identity(
+            cause_role="Aggregation",
+            consequence_kind="LocalPopulation",
+        ),
+        instance_id="inst-p",
+        settled_stage="P",
+    )
+    manifest = StrongBakeManifest(
+        materialized=(stage_b, stage_p),
+        baked_semantic_stages=frozenset({"B", "P"}),
+    )
+
+    invalidated = invalidate_materialized_consequence(manifest, "inst-b")
+
+    assert [(item.instance_id, item.validity) for item in invalidated.materialized] == [
+        ("inst-b", "invalid"),
+        ("inst-p", "valid"),
+    ]
+    assert invalidated.baked_semantic_stages == frozenset({"P"})
+    assert [item.instance_id for item in active_materializations(invalidated)] == ["inst-p"]
+
+
 def test_sb05_invalid_old_instance_is_replaced_not_stacked() -> None:
     """SB-05: old invalid + new valid keeps exactly one active instance per identity."""
     identity = make_identity()

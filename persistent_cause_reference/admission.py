@@ -75,18 +75,14 @@ def _has_same_epoch_cycle(trace: tuple[TemporalStep, ...]) -> bool:
         earlier_in_epoch = tuple(
             earlier for earlier in ordered[:index] if earlier.epoch == step.epoch
         )
-        latest_resolve_index = next(
-            (
-                prior_index
-                for prior_index in range(len(earlier_in_epoch) - 1, -1, -1)
-                if earlier_in_epoch[prior_index].operation == "resolve_input"
-            ),
-            None,
-        )
-        if latest_resolve_index is None or not any(
-            earlier.operation == "emit_event"
-            for earlier in earlier_in_epoch[latest_resolve_index + 1 :]
-        ):
+        resolve_seen = False
+        event_seen_after_resolve = False
+        for earlier in earlier_in_epoch:
+            if earlier.operation == "resolve_input":
+                resolve_seen = True
+            elif earlier.operation == "emit_event" and resolve_seen:
+                event_seen_after_resolve = True
+        if not event_seen_after_resolve:
             continue
         later_in_epoch = ordered[index + 1 :]
         if any(
@@ -281,13 +277,6 @@ def validate_persistent_cause_proposal(proposal: PersistentCauseProposal) -> Adm
             NO_SAME_EPOCH_CAUSAL_CYCLE,
             "SAME_EPOCH_WRITEBACK_AFFECTS_CURRENT_RESULT",
             AdmissionStatus.TEMPORAL_CYCLE_VIOLATION,
-        )
-
-    if proposal.existing_state_type is not None:
-        failures.add(
-            G1_HISTORY_NECESSITY,
-            "REPLAYABLE_EXISTENCE_IS_NOT_ADMISSION",
-            AdmissionStatus.REJECT_DERIVED_OR_CACHE,
         )
 
     return failures.result(proposal.cause_id)

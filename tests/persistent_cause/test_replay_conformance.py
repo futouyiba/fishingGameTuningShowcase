@@ -53,6 +53,31 @@ def test_pc09_reconstruction_is_canonical_for_same_logical_sequence() -> None:
     assert duplicate_transport.applied_event_ids == (1, 2, 3, 4)
 
 
+def test_pc09_semantic_order_is_not_canonicalized_by_event_id() -> None:
+    in_declared_order = replay_cause_events_stepwise(
+        "satiation:species:trout",
+        "SatiationReducer.v1",
+        (
+            CauseEvent(20, "Increase", 0.4),
+            CauseEvent(10, "Decrease", -0.2),
+        ),
+    )
+    reordered = replay_cause_events_stepwise(
+        "satiation:species:trout",
+        "SatiationReducer.v1",
+        (
+            CauseEvent(10, "Decrease", -0.2),
+            CauseEvent(20, "Increase", 0.4),
+        ),
+    )
+
+    assert in_declared_order.applied_event_ids == (20, 10)
+    assert reordered.applied_event_ids == (10, 20)
+    assert in_declared_order.final_value == pytest.approx(0.2)
+    assert reordered.final_value == pytest.approx(0.4)
+    assert in_declared_order.semantic_digest != reordered.semantic_digest
+
+
 def test_pc09_reducer_version_is_part_of_semantic_digest() -> None:
     version_one = replay_cause_events_stepwise(
         "satiation:species:trout",

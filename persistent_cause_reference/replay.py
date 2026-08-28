@@ -33,15 +33,19 @@ class CauseReplayResult:
 
 def _canonical_events(chunks: tuple[tuple[CauseEvent, ...], ...]) -> tuple[CauseEvent, ...]:
     by_logical_id: dict[int, CauseEvent] = {}
+    ordered_events: list[CauseEvent] = []
     for chunk in chunks:
         for event in chunk:
             prior = by_logical_id.get(event.logical_event_id)
-            if prior is not None and prior != event:
-                raise ValueError(
-                    f"logical event {event.logical_event_id} has conflicting replay payloads"
-                )
+            if prior is not None:
+                if prior != event:
+                    raise ValueError(
+                        f"logical event {event.logical_event_id} has conflicting replay payloads"
+                    )
+                continue
             by_logical_id[event.logical_event_id] = event
-    return tuple(by_logical_id[event_id] for event_id in sorted(by_logical_id))
+            ordered_events.append(event)
+    return tuple(ordered_events)
 
 
 def _replay(

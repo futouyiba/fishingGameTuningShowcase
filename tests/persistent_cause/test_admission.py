@@ -229,6 +229,23 @@ def test_pc10_same_epoch_writeback_cycle_is_blocker() -> None:
     )
 
 
+def test_pc10_intervening_resolve_does_not_hide_same_epoch_writeback_cycle() -> None:
+    cyclic_trace = (
+        TemporalStep(11, 10, "resolve_input", False),
+        TemporalStep(11, 20, "emit_event", False),
+        TemporalStep(11, 25, "resolve_input", False),
+        TemporalStep(11, 30, "mutate_state", False),
+        TemporalStep(11, 40, "resolve_input", True),
+    )
+
+    assert_failure(
+        complete_proposal(temporal_trace=cyclic_trace),
+        AdmissionStatus.TEMPORAL_CYCLE_VIOLATION,
+        "NO_SAME_EPOCH_CAUSAL_CYCLE",
+        "SAME_EPOCH_WRITEBACK_AFFECTS_CURRENT_RESULT",
+    )
+
+
 def test_pc10_same_epoch_mutation_without_emitted_event_is_not_the_forbidden_cycle() -> None:
     non_causal_trace = (
         TemporalStep(11, 10, "resolve_input", False),
@@ -280,4 +297,14 @@ def test_pc12_existing_replayable_state_does_not_imply_admission() -> None:
     assert result.status is not AdmissionStatus.ADMITTED
     assert "HISTORY_DIVERGENCE_NOT_ESTABLISHED" in result.reason_codes
     assert "LIFECYCLE_DECLARATION_MISSING" in result.reason_codes
-    assert "REPLAYABLE_EXISTENCE_IS_NOT_ADMISSION" in result.reason_codes
+
+
+def test_pc12_existing_state_is_neutral_when_g1_through_g7_are_independently_satisfied() -> None:
+    proposal = replace(
+        complete_proposal(),
+        existing_state_type="FallbackSafetyState",
+    )
+
+    result = validate_persistent_cause_proposal(proposal)
+
+    assert result.status is AdmissionStatus.ADMITTED

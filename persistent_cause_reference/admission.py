@@ -285,5 +285,33 @@ def validate_persistent_cause_proposal(proposal: PersistentCauseProposal) -> Adm
 def validate_persistent_cause_proposals(
     proposals: Iterable[PersistentCauseProposal],
 ) -> tuple[AdmissionResult, ...]:
-    """Validate each concrete Cause independently; no universal HistoryState merge exists."""
-    return tuple(validate_persistent_cause_proposal(proposal) for proposal in proposals)
+    """Validate concrete Causes independently while enforcing one owner per Cause ID."""
+    proposal_tuple = tuple(proposals)
+    results = [validate_persistent_cause_proposal(proposal) for proposal in proposal_tuple]
+    owners_by_cause_id: dict[str, set[str]] = {}
+    for proposal in proposal_tuple:
+        if _is_non_empty_string(proposal.cause_id) and _is_non_empty_string(
+            proposal.canonical_owner
+        ):
+            owners_by_cause_id.setdefault(proposal.cause_id, set()).add(proposal.canonical_owner)
+
+    conflicted_cause_ids = {
+        cause_id for cause_id, owners in owners_by_cause_id.items() if len(owners) > 1
+    }
+    for index, proposal in enumerate(proposal_tuple):
+        if proposal.cause_id not in conflicted_cause_ids:
+            continue
+        result = results[index]
+        failed_gates = result.failed_gates
+        if EXACTLY_ONE_CONCRETE_OWNER not in failed_gates:
+            failed_gates += (EXACTLY_ONE_CONCRETE_OWNER,)
+        reason_codes = result.reason_codes
+        if "CAUSE_ID_OWNER_CONFLICT" not in reason_codes:
+            reason_codes += ("CAUSE_ID_OWNER_CONFLICT",)
+        results[index] = AdmissionResult(
+            cause_id=result.cause_id,
+            status=AdmissionStatus.OWNER_UNRESOLVED,
+            failed_gates=failed_gates,
+            reason_codes=reason_codes,
+        )
+    return tuple(results)

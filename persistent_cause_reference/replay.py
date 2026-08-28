@@ -38,13 +38,22 @@ def _canonical_events(chunks: tuple[tuple[CauseEvent, ...], ...]) -> tuple[Cause
         for event in chunk:
             prior = by_logical_id.get(event.logical_event_id)
             if prior is not None:
-                if prior != event:
+                same_payload = prior.event_kind == event.event_kind and (
+                    prior.delta == event.delta or (prior.delta == 0.0 and event.delta == 0.0)
+                )
+                if not same_payload:
                     raise ValueError(
                         f"logical event {event.logical_event_id} has conflicting replay payloads"
                     )
                 continue
-            by_logical_id[event.logical_event_id] = event
-            ordered_events.append(event)
+            canonical_delta = 0.0 if event.delta == 0.0 else event.delta
+            canonical_event = CauseEvent(
+                logical_event_id=event.logical_event_id,
+                event_kind=event.event_kind,
+                delta=canonical_delta,
+            )
+            by_logical_id[event.logical_event_id] = canonical_event
+            ordered_events.append(canonical_event)
     return tuple(ordered_events)
 
 

@@ -284,6 +284,21 @@ def test_pc11_distinct_cause_ids_and_owners_coexist_without_universal_history_st
     assert satiation.canonical_owner != disturbance.canonical_owner
 
 
+def test_pc11_same_cause_id_cannot_claim_multiple_concrete_owners() -> None:
+    first_owner = complete_proposal()
+    second_owner = complete_proposal(canonical_owner="Spatial.DisturbanceOwner")
+
+    results = validate_persistent_cause_proposals((first_owner, second_owner))
+
+    assert [result.status for result in results] == [
+        AdmissionStatus.OWNER_UNRESOLVED,
+        AdmissionStatus.OWNER_UNRESOLVED,
+    ]
+    for result in results:
+        assert "EXACTLY_ONE_CONCRETE_OWNER" in result.failed_gates
+        assert "CAUSE_ID_OWNER_CONFLICT" in result.reason_codes
+
+
 def test_pc12_existing_replayable_state_does_not_imply_admission() -> None:
     existing_state = FallbackSafetyState(debt=0.4, active_time_credited=90.0)
     proposal = PersistentCauseProposal.from_existing_state(

@@ -78,6 +78,28 @@ def test_pc09_semantic_order_is_not_canonicalized_by_event_id() -> None:
     assert in_declared_order.semantic_digest != reordered.semantic_digest
 
 
+def test_pc09_signed_zero_duplicates_are_transport_invariant() -> None:
+    positive_zero_first = replay_cause_events_batch(
+        "satiation:species:trout",
+        "SatiationReducer.v1",
+        (
+            (CauseEvent(1, "NoOp", 0.0),),
+            (CauseEvent(1, "NoOp", -0.0),),
+        ),
+    )
+    negative_zero_first = replay_cause_events_batch(
+        "satiation:species:trout",
+        "SatiationReducer.v1",
+        (
+            (CauseEvent(1, "NoOp", -0.0),),
+            (CauseEvent(1, "NoOp", 0.0),),
+        ),
+    )
+
+    assert positive_zero_first.semantic_digest == negative_zero_first.semantic_digest
+    assert positive_zero_first.final_value == negative_zero_first.final_value == 0.0
+
+
 def test_pc09_reducer_version_is_part_of_semantic_digest() -> None:
     version_one = replay_cause_events_stepwise(
         "satiation:species:trout",

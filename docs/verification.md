@@ -14,7 +14,8 @@ Release-blocking coverage includes:
 - Current Capture runtime surface `hasEligibleResponseMode + captureRetention`;
 - mode-local sibling isolation and all-mode-ineligible behavior;
 - legacy `hardValid / captureEligible` cannot replace the canonical packet gate;
-- explicit B/P/E baked-stage consumption and duplicate-stage blockers.
+- explicit B/P/E baked-stage consumption and duplicate-stage blockers;
+- Strong Bake Manifest blockers (SB-01…SB-08 plus materialization-addressability regressions): a carrier that materialized semantic consequences fails closed without a manifest (`BAKE_MANIFEST_MISSING`); duplicate settlement by semantic identity is revision-blind (`DUPLICATE_SEMANTIC_CONSEQUENCE`); every `instance_id` globally addresses exactly one record across valid and invalid manifest history (`DUPLICATE_MATERIALIZATION_INSTANCE_ID`), so invalidation changes only the addressed instance and its resulting stage coverage; same raw fact under distinct cause roles stays legal; invalidation is replacement, never stacking; required lineage fields (`BAKE_LINEAGE_INCOMPLETE`) and unknown validity (`BAKE_VALIDITY_UNKNOWN`) fail closed before the numeric kernel; stage summaries are cross-checked against manifest coverage (`BAKE_STAGE_SUMMARY_MISMATCH`); attaching the manifest leaves the pre-existing partial/full bake numbers unchanged.
 
 ### Current Fallback settlement reference tests
 Tests under `tests/fallback_integration/` protect the state transition between authoritative replay TrueNone results and Fallback safety state.

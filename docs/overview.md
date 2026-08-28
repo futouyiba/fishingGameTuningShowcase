@@ -11,10 +11,12 @@ It now contains five explicitly separated verification tracks:
 
 2. **Current Candidate Weight reference track**
    - Pure deterministic fixed-pan reference kernel
-   - Public cross-domain packet-contract tests
-   - Current Capture runtime surface: `hasEligibleResponseMode + captureRetention`; legacy `hardValid/captureEligible` is not a canonical required field
+   - Current Candidate numeric surface is exactly `W = localSpeciesIntensity × captureRetention` via `CandidateWeightInputs`; readiness, aggregation, global availability and other upstream semantics have no numeric hook on the consumer interface
+   - Readiness public surface no longer requires `globalAvailability`; Interaction consumes states / motivation / enabled modes and projects behavioral effects into the resolved `captureRetention`
+   - Current Capture runtime surface: `hasEligibleResponseMode + captureRetention`; the flag is typed zero / policy-guard metadata (a positive retention without an eligible mode fails closed as `CAPTURE_PACKET_INCONSISTENT`), not a consumer-side gate multiplier; legacy `hardValid/captureEligible` is not a canonical required field
    - Mode-local eligibility derivation protects sibling isolation: one ineligible Mode does not invalidate another eligible Mode
    - Compiled ambient `B/P/E` stage-consumption guards
+   - The retired `×G×V×C` factorized chain exists only in `candidate_weight_reference/legacy.py` behind explicitly marked pinned legacy fixtures that materialize a final W for the shared kernel
    - Implemented under `candidate_weight_reference/` with tests under `tests/reference_harness/`
 
 3. **Current Fallback settlement reference track**

@@ -24,12 +24,15 @@ Fields per pond:
 These Python dataclasses/functions are verification contracts, not production wire schemas.
 
 ### Candidate Weight reference
-- Readiness public surface: `globalAvailability`, `activeBehavioralStates`, `motivationProfile`, `enabledResponseModes`
-- Capture runtime surface: `hasEligibleResponseMode`, `captureRetention`
+- Current Candidate numeric surface: `CandidateWeightInputs(local_species_intensity, capture_retention)` with `W = localSpeciesIntensity × captureRetention` (`calculate_candidate_weight` / `resolve_candidate_weights`); the consumer interface accepts no other multiplier
+- Spatial output surface: `localSpeciesIntensity` (required) plus optional `bakedSemanticStages / aggregationContextRef` provenance metadata that never enters arithmetic
+- Readiness public surface: `activeBehavioralStates`, `motivationProfile`, `enabledResponseModes`; `globalAvailability` is not a required field and cannot re-enter the surface
+- Capture runtime surface: `hasEligibleResponseMode`, `captureRetention`; the flag is typed metadata and a positive retention without an eligible mode fails closed (`CAPTURE_PACKET_INCONSISTENT`)
 - `derive_has_eligible_response_mode(modeResponses[])`: `any(modeEligible[m])`
 - legacy `hardValid / captureEligible` does not satisfy the Current canonical reader
 - `calculate_true_pool(...)`: fixed-pan total weight, saturation, `spawn_probability_per_opportunity`, and Species `probability_per_opportunity`
 - `CompiledAmbientCarrier.baked_semantic_stages`: explicit subset of `B/P/E`; missing metadata blocks evaluation
+- `legacy_factorized_weight(...)` in `candidate_weight_reference/legacy.py`: pinned historical `×G×V×C` reproduction for explicitly marked legacy fixtures only; it is not exported on the Current package surface
 
 ### Fallback settlement reference
 `FallbackSafetyState` stores:

@@ -60,6 +60,25 @@ Coverage includes:
 
 Fixture-K `MeasureSpan` uses linear interpolation inside an already-semantic accepted span only as a deterministic fixture encoding for locating known crossings. It is not a Production sampling, packetization, or raw-presentation recognition contract.
 
+### Current ActualPresentation realization reference tests
+Tests in `tests/reference_harness/test_actual_presentation_realization.py` protect the upstream fish-agnostic realization boundary before Opportunity and Interaction.
+
+Release-blocking coverage includes:
+- **AP-01 — fish independence:** changing an external Species choice cannot change canonical Presentation output because Species is absent from the realization contract;
+- **AP-02 — identity is causal lineage only:** different item, technique and rig IDs with equivalent capabilities preserve semantic identity while producing distinct opaque input fingerprints;
+- **AP-03 — authoritative physics causality:** authoritative flow changes derived drift, motion and position;
+- **AP-04 — fish/evaluative anti-fields:** recursive payload injection fails with a typed ownership violation, and admission is allowlist-based so unlisted fish-preference synonyms (`trout-preferred`, `ticket_rate`, `strike_likelihood`) fail closed rather than passing a denylist gap (ADR 0003);
+- **AP-05 — Opportunity anti-fields:** cadence and Opportunity formation/lifecycle fields are rejected;
+- **AP-06 — Interaction anti-fields:** fish perception and response fields are rejected;
+- **AP-07 — typed incompleteness:** every required unresolved input returns `Unknown`, `Unsupported` or `InsufficientEvidence` and no numeric `ActualPresentation`;
+- **AP-08 — World authority lineage:** World snapshot/revision stays in provenance while Presentation owns only derived realization facts;
+- **AP-09 — version and lineage validation:** semantic version, resolver/projection version, input fingerprint and canonical identity mismatches fail closed;
+- **AP-10 — deterministic replay:** replay bytes are stable and insignificant numeric representation noise canonicalizes without becoming an identity setter;
+- **AP-11 — bounded temporal motif:** equivalent split/merged phase segmentation normalizes to equivalent semantic output;
+- **AP-12 — downstream Opportunity boundary:** a test-local projection feeds the existing `opportunity_reference` API, while production Presentation code neither imports nor constructs Opportunity types.
+
+The reference kinematic projection proves the semantic boundary only. It does not implement Production fishing physics, determine fish preference or perception, construct or consume `LogicalOpportunity`, own cadence/refractory/non-overlap, or calculate Candidate Weight. A validated client-derived carrier remains a claim; Reference lineage consistency does not grant Production authority.
+
 ## CI gate
 `./verify.sh` is the repository gate and uses non-mutating `ruff format --check`, Ruff lint, and pytest.
 

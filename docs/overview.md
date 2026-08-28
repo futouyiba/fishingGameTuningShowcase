@@ -2,7 +2,7 @@
 
 This repo exists to turn fishing-sim numeric systems into **verifiable artifacts**.
 
-It now contains five explicitly separated verification tracks:
+It now contains six explicitly separated verification tracks:
 
 1. **Legacy environment-field track**
    - Configs (nested JSON) -> derived environment field (`x*y*z*fish`)
@@ -45,6 +45,18 @@ It now contains five explicitly separated verification tracks:
    - Optional fixture-only support joins apply `Join Before Reduce` before feeding opportunity-scoped weights into the existing Candidate Weight `calculate_true_pool(...)`
    - ScopeClip remains fail-closed until an admitted owner policy is implemented; the adapter does not invent a clipping rule
    - Implemented under `opportunity_reference/` with Fixture-K tests under `tests/opportunity_semantic/`
+
+6. **Current ActualPresentation realization reference track**
+   - Resolves Player Action + technique/equipment/rig capabilities + authoritative World/Physics into a deterministic, fish-agnostic `ActualPresentation`
+   - Uses a deliberately thin kinematic projection to prove causality and ownership boundaries; it is not a Production physics simulator
+   - Keeps content IDs as opaque input lineage rather than semantic identity setters, while authoritative World snapshot/revision remains provenance rather than copied Presentation-owned truth
+   - Canonicalizes finite numbers, ordering and adjacent equivalent phase segments so physically equivalent episodes have equivalent semantic output; the `actual-presentation/v1` nine-digit numeric policy is pinned in `docs/adr/0002-actual-presentation-canonical-precision.md`
+   - Represents required `Unknown / Unsupported / InsufficientEvidence` inputs explicitly and emits no fabricated neutral presentation
+   - Rejects fish/evaluative, Opportunity-owned and Interaction-owned anti-fields recursively and validates semantic version, resolver/projection lineage, input fingerprint and canonical identity fail-closed
+   - Admits canonical output through a Presentation-owned schema and closed phase/cue/descriptor vocabularies pinned in `docs/adr/0003-actual-presentation-closed-vocabularies.md`, so unlisted fish/Opportunity/Interaction synonyms fail closed instead of being admitted by a denylist gap
+   - Does not calculate fish preference/perception, form or consume `LogicalOpportunity`, own cadence/refractory/non-overlap, or calculate/modify Candidate Weight
+   - Client-materialized output remains a claim carrier: Reference validation checks projection consistency but does not promote it to Production authority
+   - Implemented under `presentation_realization_reference/` with AP-01 through AP-12 blockers under `tests/reference_harness/`
 
 The current reference tracks are intentionally isolated from `compute/`: they must not inherit the legacy invariant that fish weights are normalized to 1 per voxel. Future production adapters should be differential-tested against these references rather than reusing production functions as their oracle.
 

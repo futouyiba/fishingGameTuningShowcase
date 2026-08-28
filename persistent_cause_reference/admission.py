@@ -34,6 +34,13 @@ _STATUS_PRECEDENCE = (
 )
 
 
+def _highest_precedence_status(statuses: set[AdmissionStatus]) -> AdmissionStatus:
+    for candidate in _STATUS_PRECEDENCE:
+        if candidate in statuses:
+            return candidate
+    return AdmissionStatus.ADMITTED
+
+
 class _Failures:
     def __init__(self) -> None:
         self.gates: list[str] = []
@@ -48,11 +55,7 @@ class _Failures:
         self.statuses.add(status)
 
     def result(self, cause_id: str) -> AdmissionResult:
-        status = AdmissionStatus.ADMITTED
-        for candidate in _STATUS_PRECEDENCE:
-            if candidate in self.statuses:
-                status = candidate
-                break
+        status = _highest_precedence_status(self.statuses)
         return AdmissionResult(cause_id, status, tuple(self.gates), tuple(self.reasons))
 
 
@@ -310,7 +313,7 @@ def validate_persistent_cause_proposals(
             reason_codes += ("CAUSE_ID_OWNER_CONFLICT",)
         results[index] = AdmissionResult(
             cause_id=result.cause_id,
-            status=AdmissionStatus.OWNER_UNRESOLVED,
+            status=_highest_precedence_status({result.status, AdmissionStatus.OWNER_UNRESOLVED}),
             failed_gates=failed_gates,
             reason_codes=reason_codes,
         )

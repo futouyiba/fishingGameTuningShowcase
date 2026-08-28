@@ -100,6 +100,28 @@ def test_pc09_signed_zero_duplicates_are_transport_invariant() -> None:
     assert positive_zero_first.final_value == negative_zero_first.final_value == 0.0
 
 
+def test_pc09_numeric_duplicate_representations_are_transport_invariant() -> None:
+    integer_first = replay_cause_events_batch(
+        "satiation:species:trout",
+        "SatiationReducer.v1",
+        (
+            (CauseEvent(1, "Increase", 1),),
+            (CauseEvent(1, "Increase", 1.0),),
+        ),
+    )
+    float_first = replay_cause_events_batch(
+        "satiation:species:trout",
+        "SatiationReducer.v1",
+        (
+            (CauseEvent(1, "Increase", 1.0),),
+            (CauseEvent(1, "Increase", 1),),
+        ),
+    )
+
+    assert integer_first.semantic_digest == float_first.semantic_digest
+    assert integer_first.final_value == float_first.final_value == 1.0
+
+
 def test_pc09_reducer_version_is_part_of_semantic_digest() -> None:
     version_one = replay_cause_events_stepwise(
         "satiation:species:trout",

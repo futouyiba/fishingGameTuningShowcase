@@ -299,6 +299,28 @@ def test_pc11_same_cause_id_cannot_claim_multiple_concrete_owners() -> None:
         assert "CAUSE_ID_OWNER_CONFLICT" in result.reason_codes
 
 
+def test_pc11_owner_conflict_preserves_higher_precedence_status() -> None:
+    history_failure = complete_proposal(
+        history_necessity_proof=HistoryNecessityProof(
+            same_present_inputs=True,
+            different_admissible_histories=True,
+            desired_future_outputs_differ=False,
+            fixture_ref="fixture:no-divergence",
+        )
+    )
+    conflicting_owner = complete_proposal(canonical_owner="Spatial.DisturbanceOwner")
+
+    history_result, owner_result = validate_persistent_cause_proposals(
+        (history_failure, conflicting_owner)
+    )
+
+    assert history_result.status is AdmissionStatus.REJECT_DERIVED_OR_CACHE
+    assert owner_result.status is AdmissionStatus.OWNER_UNRESOLVED
+    for result in (history_result, owner_result):
+        assert "EXACTLY_ONE_CONCRETE_OWNER" in result.failed_gates
+        assert "CAUSE_ID_OWNER_CONFLICT" in result.reason_codes
+
+
 def test_pc12_existing_replayable_state_does_not_imply_admission() -> None:
     existing_state = FallbackSafetyState(debt=0.4, active_time_credited=90.0)
     proposal = PersistentCauseProposal.from_existing_state(
